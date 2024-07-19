@@ -2,8 +2,11 @@ import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 class Vectorization:
-    def __init__(self):
-        self.model_tfidf = TfidfVectorizer()
+    def __init__(self, use_idf = True):
+        if use_idf:
+            self.model_tfidf = TfidfVectorizer()
+        else:
+            self.model_tfidf = TfidfVectorizer(use_idf=False, norm = None)
 
     def fit_transform(self, X, min_df=3):
         X = self.remove_min_df(X, min_df)
@@ -26,6 +29,7 @@ class Vectorization:
         return len(self.model_tfidf.get_feature_names_out())
 
     def transform(self, X):
+        X = X.fillna('')
         return self.model_tfidf.transform(X).toarray()
 
     def transform_text(self, text):
