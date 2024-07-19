@@ -18,11 +18,18 @@ class Model_SVM:
 
     def predict_proba(self, X):
         probabilities = self.model.predict_proba(X)
-        return [
+        results = [
             {str(label): float(prob) for label, prob in zip(self.model.classes_, prob_array)}
             for prob_array in probabilities
         ]
 
+        # Sắp xếp các từ điển theo giá trị prob
+        sorted_results = [
+            dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))
+            for prob_dict in results
+        ]
+
+        return sorted_results
 
     def save_model(self, path_save_model):
         return joblib.dump(self.model, path_save_model)

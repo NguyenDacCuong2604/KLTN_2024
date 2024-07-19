@@ -1,6 +1,7 @@
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+
 class Vectorization:
     def __init__(self):
         self.model_tfidf = TfidfVectorizer()
@@ -32,7 +33,7 @@ class Vectorization:
         return self.model_tfidf.transform([text]).toarray()
 
     def save_model(self, path_save_model):
-        return joblib.dump(self.model_tfidf,path_save_model)
+        return joblib.dump(self.model_tfidf, path_save_model)
 
     def load_model(self, path_model):
         self.model_tfidf = joblib.load(path_model)
