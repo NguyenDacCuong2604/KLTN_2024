@@ -1,7 +1,6 @@
 import re
 import pandas as pd
 from pyvi import ViTokenizer, ViPosTagger
-import os
 
 
 class VietnameseTextPreprocessor:
@@ -204,5 +203,7 @@ class VietnameseTextPreprocessor:
         if (len(columns)) <= 1:
             return
         data['input'] = data[columns[0]].apply(lambda x: self.process_text(x))
-        data.to_csv(output_path, index=False)
+        data['label'] = data[columns[1]]
+        result_df = data[['input', 'label']]
+        return result_df.to_csv(output_path, index=False)
 
