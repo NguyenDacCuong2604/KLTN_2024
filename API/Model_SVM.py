@@ -22,7 +22,6 @@ class Model_SVM:
             {str(label): float(prob) for label, prob in zip(self.model.classes_, prob_array)}
             for prob_array in probabilities
         ]
-
         # Sắp xếp các từ điển theo giá trị prob
         sorted_results = [
             dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))
