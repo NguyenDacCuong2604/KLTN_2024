@@ -4,7 +4,8 @@ from pyvi import ViTokenizer, ViPosTagger
 
 
 class VietnameseTextPreprocessor:
-    def __init__(self, path_stopwords=None):
+    def __init__(self, path_stopwords=None, remove_np=True):
+        self.remove_np = remove_np
         self.stopwords = self.load_stopwords(path_stopwords)
         self.dicchar = self.loaddictchar()
         self.bang_nguyen_am = [['a', 'à', 'á', 'ả', 'ã', 'ạ'],
@@ -100,7 +101,8 @@ class VietnameseTextPreprocessor:
                     if x != -1:
                         chars[2] = self.bang_nguyen_am[x][dau_cau]
                     else:
-                        chars[1] = self.bang_nguyen_am[5][dau_cau] if chars[1] == 'i' else self.bang_nguyen_am[9][dau_cau]
+                        chars[1] = self.bang_nguyen_am[5][dau_cau] if chars[1] == 'i' else self.bang_nguyen_am[9][
+                            dau_cau]
                 return ''.join(chars)
             return word
 
@@ -173,8 +175,9 @@ class VietnameseTextPreprocessor:
         return ' '.join(filtered_words)
 
     def process_text(self, text):
-        text = self.chuan_hoa_dau_tu_tieng_viet(text)
-        text = text.replace('_x000D_', '')
+        text = self.chuan_hoa_dau_cau_tieng_viet(text)  # Chuẩn hóa dấu câu tiếng việt và chuyển đổi Windown1525 thành UTF8
+        text = text.replace('_x000D_',
+                            '')  # _x000D_ là mã Unicode biểu diễn ký tự xuống dòng (CR-Carriage Return) (Cái này khi up file excel, mở bằng GG Sheets sẽ bị ở những chổ xuống dòng dữ liệu '\n')
 
         # Kiểm tra tỷ lệ ký tự viết hoa trong văn bản
         upper_case_chars = sum(1 for char in text if char.isupper())
@@ -188,11 +191,15 @@ class VietnameseTextPreprocessor:
         """
 
         postagging_text = ViPosTagger.postagging(ViTokenizer.tokenize(text))  # Dùng Vi để tách từ và gán postagger
-        text = self.filter_and_join_words(postagging_text, True)  # Loại bỏ các từ có postagger không cần thiết
+        text = self.filter_and_join_words(postagging_text, self.remove_np)  # Loại bỏ các từ có postagger không cần thiết
         text = re.sub(r'[^\w\s]', '', text)  # Loại bỏ các ký tự đặc biệt thêm 1 lần nữa nếu sau khi tách từ vấn còn
         word_tokens = text.split()
-        filtered_text = [word for word in word_tokens if
-                         word.lower() not in self.stopwords]  # Loại bỏ các từ trong bộ stopwords
+        filtered_text = []
+        for word in word_tokens:
+            if word.lower() in self.stopwords:
+                continue
+            else:
+                filtered_text.append(word)
         filtered_text = [word for word in filtered_text if len(word) > 1]  # Loại bỏ các từ đơn
         filtered_text = ' '.join(filtered_text)
         return filtered_text.lower()  # Trả về text lower
@@ -205,5 +212,16 @@ class VietnameseTextPreprocessor:
         data['input'] = data[columns[0]].apply(lambda x: self.process_text(x))
         data['label'] = data[columns[1]]
         result_df = data[['input', 'label']]
+
+        word_counts = {}
+        for index, row in data.iterrows():
+            words = str(row['input']).split()
+            for word in words:
+                if word in word_counts:
+                    word_counts[word] += 1
+                else:
+                    word_counts[word] = 1
+
+        print(len(word_counts))
         return result_df.to_csv(output_path, index=False)
 

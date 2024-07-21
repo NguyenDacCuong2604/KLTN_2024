@@ -1,41 +1,80 @@
 from Code.Model_SVM import Model_SVM
 import pandas as pd
-
+from datetime import datetime
 from Code.Vectorization import Vectorization
 
 if __name__ == "__main__":
-    #v1
-    path_data_train1 = '../Dataset/Root/data_preprocessing_v1.csv'
-    path_save_model_vector1 = '../Model/tfidf_v1.model'
-    path_save_model1 = '../Model/svm_v1.model'
-    df1 = pd.read_csv(path_data_train1)
+    #Không sử dụng stopwords
+    print('Không sử dụng stopwords')
+    path_data_train_not_stopwords = '../Dataset/Root/data_preprocessing_not_stopwords.csv'
+    path_save_model_vector_not_stopwords = '../Model/tfidf_not_stopwords.model'
+    path_save_model_not_stopwords = '../Model/svm_not_stopwords.model'
+    df_not_stopwords = pd.read_csv(path_data_train_not_stopwords)
 
-    X_train1 = df1['input']
-    y_train1 = df1['label']
+    X_train_not_stopwords = df_not_stopwords['input']
+    y_train_not_stopwords = df_not_stopwords['label']
 
-    vectorization1 = Vectorization()
-    X_train_vector1 = vectorization1.fit_transform(X_train1)
-    vectorization1.save_model(path_save_model_vector1)
+    vectorization_not_stopwords = Vectorization()
+    current_time = datetime.now().timestamp()
+    X_train_vector_not_stopwords = vectorization_not_stopwords.fit_transform(X_train_not_stopwords)
+    print('Thời gian vector hóa')
+    print((datetime.now().timestamp() - current_time) * 1000)
+    print(vectorization_not_stopwords.get_vector_size())
+    vectorization_not_stopwords.save_model(path_save_model_vector_not_stopwords)
 
-    model1 = Model_SVM()
-    model1.fit(X_train_vector1, y_train1)
+    model_not_stopwords = Model_SVM()
+    current_time = datetime.now().timestamp()
+    model_not_stopwords.fit(X_train_vector_not_stopwords, y_train_not_stopwords)
+    print('Thời gian train model')
+    print((datetime.now().timestamp() - current_time) * 1000)
+    model_not_stopwords.save_model(path_save_model_not_stopwords)
 
-    model1.save_model(path_save_model1)
+    # Sử dụng stopwords vietnamese
+    print('Sử dụng stopwords vietnamese')
+    path_data_train_stopwords_vietnamese = '../Dataset/Root/data_preprocessing_stopwords_vietnamese.csv'
+    path_save_model_vector_stopwords_vietnamese = '../Model/tfidf_stopwords_vietnamese.model'
+    path_save_model_stopwords_vietnamese = '../Model/svm_stopwords_vietnamese.model'
+    df_stopwords_vietnamese = pd.read_csv(path_data_train_stopwords_vietnamese)
 
-    #v2
-    path_data_train2 = '../Dataset/Root/data_preprocessing_v2.csv'
-    path_save_model_vector2 = '../Model/tfidf_v2.model'
-    path_save_model2 = '../Model/svm_v2.model'
-    df2 = pd.read_csv(path_data_train2)
+    X_train_stopwords_vietnamese = df_stopwords_vietnamese['input']
+    y_train_stopwords_vietnamese = df_stopwords_vietnamese['label']
 
-    X_train2 = df2['input']
-    y_train2 = df2['label']
+    vectorization_stopwords_vietnamese = Vectorization()
+    current_time = datetime.now().timestamp()
+    X_train_vector_stopwords_vietnamese = vectorization_stopwords_vietnamese.fit_transform(X_train_stopwords_vietnamese)
+    print('Thời gian vector hóa')
+    print((datetime.now().timestamp() - current_time) * 1000)
+    print(vectorization_stopwords_vietnamese.get_vector_size())
+    vectorization_stopwords_vietnamese.save_model(path_save_model_vector_stopwords_vietnamese)
 
-    vectorization2 = Vectorization()
-    X_train_vector2 = vectorization2.fit_transform(X_train2)
-    vectorization2.save_model(path_save_model_vector2)
+    model_stopwords_vietnamese = Model_SVM()
+    current_time = datetime.now().timestamp()
+    model_stopwords_vietnamese.fit(X_train_vector_stopwords_vietnamese, y_train_stopwords_vietnamese)
+    print('Thời gian train model')
+    print((datetime.now().timestamp() - current_time) * 1000)
+    model_stopwords_vietnamese.save_model(path_save_model_stopwords_vietnamese)
 
-    model2 = Model_SVM()
-    model2.fit(X_train_vector2, y_train2)
+    # Sử dụng stopwords project
+    print('Sử dụng stopwords project')
+    path_data_train_stopwords_project = '../Dataset/Root/data_preprocessing_stopwords_project.csv'
+    path_save_model_vector_stopwords_project = '../Model/tfidf_stopwords_project.model'
+    path_save_model_stopwords_project = '../Model/svm_stopwords_project.model'
+    df_stopwords_project = pd.read_csv(path_data_train_stopwords_project)
 
-    model2.save_model(path_save_model2)
+    X_train_stopwords_project = df_stopwords_project['input']
+    y_train_stopwords_project = df_stopwords_project['label']
+
+    vectorization_stopwords_project = Vectorization()
+    current_time = datetime.now().timestamp()
+    X_train_vector_stopwords_project = vectorization_stopwords_project.fit_transform(X_train_stopwords_project)
+    print('Thời gian vector hóa')
+    print((datetime.now().timestamp() - current_time) * 1000)
+    print(vectorization_stopwords_project.get_vector_size())
+    vectorization_stopwords_project.save_model(path_save_model_vector_stopwords_project)
+
+    model_stopwords_project = Model_SVM()
+    current_time = datetime.now().timestamp()
+    model_stopwords_project.fit(X_train_vector_stopwords_project, y_train_stopwords_project)
+    print('Thời gian train model')
+    print((datetime.now().timestamp() - current_time) * 1000)
+    model_stopwords_project.save_model(path_save_model_stopwords_project)

@@ -1,14 +1,12 @@
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-class Vectorization:
-    def __init__(self, use_idf = True):
-        if use_idf:
-            self.model_tfidf = TfidfVectorizer()
-        else:
-            self.model_tfidf = TfidfVectorizer(use_idf=False, norm = None)
 
-    def fit_transform(self, X, min_df=3):
+class Vectorization:
+    def __init__(self):
+        self.model_tfidf = TfidfVectorizer()
+
+    def fit_transform(self, X, min_df=0):
         X = self.remove_min_df(X, min_df)
         return self.model_tfidf.fit_transform(X)
 
@@ -36,7 +34,7 @@ class Vectorization:
         return self.model_tfidf.transform([text]).toarray()
 
     def save_model(self, path_save_model):
-        return joblib.dump(self.model_tfidf,path_save_model)
+        return joblib.dump(self.model_tfidf, path_save_model)
 
     def load_model(self, path_model):
         self.model_tfidf = joblib.load(path_model)
