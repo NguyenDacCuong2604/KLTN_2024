@@ -204,6 +204,12 @@ class VietnameseTextPreprocessor:
         filtered_text = ' '.join(filtered_text)
         return filtered_text.lower()  # Trả về text lower
 
+    def process_df(self, df, column_input, column_label):
+        df['input'] = df[column_input].apply(lambda x: self.process_text(x))
+        df['label'] = df[column_label]
+        result_df = df[['input', 'label']]
+        return result_df
+
     def process_file(self, input_path, output_path):
         data = pd.read_csv(input_path)
         columns = data.columns
