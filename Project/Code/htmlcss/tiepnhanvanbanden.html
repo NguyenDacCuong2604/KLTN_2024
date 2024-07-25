@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            background-color: #f2f2f2;
+            width: 20%;
+            padding: 20px;
+        }
+
+        .content {
+            width: 80%;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .form-group button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>SỞ NỘI VỤ THÀNH PHỐ HỒ CHÍ MINH</h1>
+        <h1>QUẢN LÝ VĂN BẢN VÀ HỒ SƠ CÔNG VIỆC</h1>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li>Tiếp nhận văn bản đến (AUH)</li>
+                <li>Hộp thư văn bản đến (A02)</li>
+                <li>Dự thảo văn bản (2)</li>
+                <li>Phát hành văn bản nội bộ (3)</li>
+                <li>Phát hành văn bản liên thông (4)</li>
+                <li>Lưu và nhập sắp (77)</li>
+                <li>Lưu và Tình Chánh VP</li>
+                <li>Thêm mới (Giống VB trước) (9)</li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="form-group">
+                <label for="vanban">Văn bản đến</label>
+                <input type="text" id="vanban" placeholder="Nhập từ khóa tìm kiếm">
+                <button type="button">Tìm kiếm</button>
+            </div>
+            <div class="form-group">
+                <label for="sovanban">Số văn bản</label>
+                <input type="number" id="sovanban">
+            </div>
+            <div class="form-group">
+                <label for="kyhieu">Số ký hiệu của văn bản</label>
+                <input type="text" id="kyhieu">
+            </div>
+            <div class="form-group">
+                <label for="coquan">Cơ quan ban hành</label>
+                <input type="text" id="coquan">
+            </div>
+            <div class="form-group">
+                <label for="loaivanban">Loại văn bản</label>
+                <input type="text" id="loaivanban">
+            </div>
+            <div class="form-group">
+                <label for="trichieu">Trích yếu</label>
+                <textarea id="trichieu"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="chitiet">Chi tiết</label>
+                <textarea id="chitiet"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="vanbanchidao">Văn bản chỉ đạo</label>
+                <input type="checkbox" id="vanbanchidao">
+            </div>
+            <div class="form-group">
+                <label for="bangiay">Có bản giấy</label>
+                <input type="checkbox" id="bangiay">
+            </div>
+            <div class="form-group">
+                <button type="button">Chấp nhận</button>
+            </div>
+            <div class="form-group">
+                <label for="vanbanqppl">Văn bản QPPL</label>
+                <input type="checkbox" id="vanbanqppl">
+            </div>
+            <div class="form-group">
+                <label for="ngayden">Ngày đến</label>
+                <input type="date" id="ngayden">
+                <input type="time" id="gioden">
+                <button type="button">Lưu</button>
+            </div>
+            <div class="form-group">
+                <label for="ngaybanhanh">Ngày ban hành</label>
+                <input type="date" id="ngaybanhanh">
+            </div>
+            <div class="form-group">
+                <label for="coquanbanhanh">Cơ quan ban hành</label>
+                <input type="text" id="coquanbanhanh">
+            </div>
+            <div class="form-group">
+                <label for="linhvuc">Lĩnh vực</label>
+                <input type="text" id="linhvuc">
+            </div>
+            <div class="form-group">
+                <label for="phanhan">Phân hạn xử lý</label>
+                <select id="phanhan">
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="anhoisodinhkem">An hồ sơ đính kèm</label>
+                <input type="file" id="anhoisodinhkem">
+            </div>
+            <div class="form-group">
+                <button type="button">Tập hồ sơ</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
