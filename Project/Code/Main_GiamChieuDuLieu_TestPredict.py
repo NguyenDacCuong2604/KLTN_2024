@@ -30,22 +30,22 @@ if __name__ == "__main__":
 
     model_svm_stopwords_project.get_confusion_matrix(y_test, y_pred_stopwords_project)
 
-    #Test trường hợp sử dụng SVD
-    vectorization_stopwords_project = Vectorization()
-    vectorization_stopwords_project.load_model('../Model/tfidf_stopwords_project_svd.model')
-
-    X_test_vector_stopwords_project = vectorization_stopwords_project.transform(X_test_preprocessing)
-
-    svd = SVD()
-    svd.load_model('../Model/svd.model')
-
-    X_test_vector_svd = svd.transform(X_test_vector_stopwords_project)
-
-    model_svm_stopwords_project = Model_SVM()
-    model_svm_stopwords_project.load_model('../Model/svm_stopwords_project_svd.model')
-
-    y_pred_stopwords_project = model_svm_stopwords_project.predict(X_test_vector_svd)
-
-    model_svm_stopwords_project.get_metrics(y_test, y_pred_stopwords_project)
-
-    model_svm_stopwords_project.get_confusion_matrix(y_test, y_pred_stopwords_project)
+    # #Test trường hợp sử dụng SVD
+    # vectorization_stopwords_project = Vectorization()
+    # vectorization_stopwords_project.load_model('../Model/tfidf_stopwords_project_svd.model')
+    #
+    # X_test_vector_stopwords_project = vectorization_stopwords_project.transform(X_test_preprocessing)
+    #
+    # svd = SVD()
+    # svd.load_model('../Model/svd.model')
+    #
+    # X_test_vector_svd = svd.transform(X_test_vector_stopwords_project)
+    #
+    # model_svm_stopwords_project = Model_SVM()
+    # model_svm_stopwords_project.load_model('../Model/svm_stopwords_project_svd.model')
+    #
+    # y_pred_stopwords_project = model_svm_stopwords_project.predict(X_test_vector_svd)
+    #
+    # model_svm_stopwords_project.get_metrics(y_test, y_pred_stopwords_project)
+    #
+    # model_svm_stopwords_project.get_confusion_matrix(y_test, y_pred_stopwords_project)

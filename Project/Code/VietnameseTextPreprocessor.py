@@ -4,7 +4,8 @@ from pyvi import ViTokenizer, ViPosTagger
 
 
 class VietnameseTextPreprocessor:
-    def __init__(self, path_stopwords=None, remove_np=True):
+    def __init__(self, path_stopwords=None, remove_np=True, multi_label=True):
+        self.multi_label = multi_label
         self.remove_np = remove_np
         self.stopwords = self.load_stopwords(path_stopwords)
         self.dicchar = self.loaddictchar()
@@ -175,7 +176,8 @@ class VietnameseTextPreprocessor:
         return ' '.join(filtered_words)
 
     def process_text(self, text):
-        text = self.chuan_hoa_dau_cau_tieng_viet(text)  # Chuẩn hóa dấu câu tiếng việt và chuyển đổi Windown1525 thành UTF8
+        text = self.chuan_hoa_dau_cau_tieng_viet(
+            text)  # Chuẩn hóa dấu câu tiếng việt và chuyển đổi Windown1525 thành UTF8
         text = text.replace('_x000D_',
                             '')  # _x000D_ là mã Unicode biểu diễn ký tự xuống dòng (CR-Carriage Return) (Cái này khi up file excel, mở bằng GG Sheets sẽ bị ở những chổ xuống dòng dữ liệu '\n')
 
@@ -191,7 +193,8 @@ class VietnameseTextPreprocessor:
         """
 
         postagging_text = ViPosTagger.postagging(ViTokenizer.tokenize(text))  # Dùng Vi để tách từ và gán postagger
-        text = self.filter_and_join_words(postagging_text, self.remove_np)  # Loại bỏ các từ có postagger không cần thiết
+        text = self.filter_and_join_words(postagging_text,
+                                          self.remove_np)  # Loại bỏ các từ có postagger không cần thiết
         text = re.sub(r'[^\w\s]', '', text)  # Loại bỏ các ký tự đặc biệt thêm 1 lần nữa nếu sau khi tách từ vấn còn
         word_tokens = text.split()
         filtered_text = []
@@ -204,7 +207,35 @@ class VietnameseTextPreprocessor:
         filtered_text = ' '.join(filtered_text)
         return filtered_text.lower()  # Trả về text lower
 
+    def get_data_duplicated(self, df, column_input, column_output):
+        # Lấy các hàng trùng lặp dựa trên cột "Trích yếu"
+        duplicated_data = df[df.duplicated(subset=column_input, keep=False)]
+
+        grouped = duplicated_data.groupby(column_input)
+        filtered_data = []
+        for name, group in grouped:
+            counts = group[column_output].value_counts()
+            if len(counts) == 1:
+                filtered_data.append(group)
+            else:
+                # Lấy số lượng count của counts top 2
+                top_counts = counts.nlargest(2)
+                first_top_count = top_counts.iloc[0]
+                second_top_count = top_counts.iloc[1]
+                count_data = first_top_count - second_top_count
+                top_id = counts.idxmax()
+                top_group = group[group[column_output] == top_id]
+                get_data_top = top_group.head(count_data)
+                filtered_data.append(get_data_top)
+        filtered_data = pd.concat(filtered_data)  # Dữ liệu đã loại bỏ các trích yếu nhiều nhãn
+
+        return duplicated_data.drop(filtered_data.index)  # Dữ liệu mà trích yếu có nhiều nhãn
+
     def process_df(self, df, column_input, column_label):
+        if not self.multi_label:
+            df_duplicated = self.get_data_duplicated(df, column_input, column_label)
+            df = df.drop(df_duplicated.index)
+
         df['input'] = df[column_input].apply(lambda x: self.process_text(x))
         df['label'] = df[column_label]
         result_df = df[['input', 'label']]
@@ -215,19 +246,12 @@ class VietnameseTextPreprocessor:
         columns = data.columns
         if (len(columns)) <= 1:
             return
+        if not self.multi_label:
+            df_duplicated = self.get_data_duplicated(data, columns[0], columns[1])
+            data = data.drop(df_duplicated.index)
+
         data['input'] = data[columns[0]].apply(lambda x: self.process_text(x))
         data['label'] = data[columns[1]]
         result_df = data[['input', 'label']]
 
-        word_counts = {}
-        for index, row in data.iterrows():
-            words = str(row['input']).split()
-            for word in words:
-                if word in word_counts:
-                    word_counts[word] += 1
-                else:
-                    word_counts[word] = 1
-
-        print(len(word_counts))
         return result_df.to_csv(output_path, index=False)
-

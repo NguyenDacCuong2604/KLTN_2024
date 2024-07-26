@@ -13,6 +13,7 @@ from Code.VietnameseTextPreprocessor import VietnameseTextPreprocessor
 
 # Tkinter GUI class
 class DataPreprocessor:
+    multi_label = False
     name_file_datapreprocess = 'data_preprocess.csv'
     min_df = 6
     name_file_vectorizer = 'tfidf.model'
@@ -192,7 +193,7 @@ class DataPreprocessor:
 
                 # Data preprocessing
                 output_path_stopword = '../Dataset/Root/data_preprocessing_stopwords_project.csv'
-                vietnameseTextPreprocessor = VietnameseTextPreprocessor(output_path_stopword)
+                vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=output_path_stopword, multi_label=self.multi_label)
                 df_preprocess = vietnameseTextPreprocessor.process_df(df, self.input_column_entry.get(),
                                                                       self.target_column_entry.get())
 
