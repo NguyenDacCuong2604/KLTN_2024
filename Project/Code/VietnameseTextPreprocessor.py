@@ -232,6 +232,7 @@ class VietnameseTextPreprocessor:
         return duplicated_data.drop(filtered_data.index)  # Dữ liệu mà trích yếu có nhiều nhãn
 
     def process_df(self, df, column_input, column_label):
+        df.dropna(inplace = True)
         if not self.multi_label:
             df_duplicated = self.get_data_duplicated(df, column_input, column_label)
             df = df.drop(df_duplicated.index)
@@ -243,6 +244,7 @@ class VietnameseTextPreprocessor:
 
     def process_file(self, input_path, output_path):
         data = pd.read_csv(input_path)
+        data.dropna(inplace = True)
         columns = data.columns
         if (len(columns)) <= 1:
             return
