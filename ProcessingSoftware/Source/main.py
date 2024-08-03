@@ -8,9 +8,9 @@ import threading
 import datetime
 import logging
 
-from Code.Model_SVM import Model_SVM
-from Code.Vectorization import Vectorization
-from Code.VietnameseTextPreprocessor import VietnameseTextPreprocessor
+from Source.SVM import SVM
+from Source.Vectorization import Vectorization
+from Source.VietnameseTextPreprocessor import VietnameseTextPreprocessor
 
 
 # Tkinter GUI class
@@ -18,6 +18,7 @@ class DataPreprocessor:
     multi_label = False
     name_file_vector_data = 'vector_data.csv'
     min_df = 6
+    output_path_stopword = 'stopwords_project.txt'
     name_file_vectorizer = 'tfidf.model'
     name_file_svm = 'svm.model'
     name_input = "Trích yếu"
@@ -81,7 +82,8 @@ class DataPreprocessor:
         self.scrollbar.grid(row=3, column=3, sticky=(tk.N, tk.S, tk.E), pady=(10, 0))
         self.text_widget.config(yscrollcommand=self.scrollbar.set)
 
-        self.start_button = tk.Button(self.frame, text="Start", command=self.toggle_processing, width=15, bg='light green', font=("Helvetica", 13))
+        self.start_button = tk.Button(self.frame, text="Start", command=self.toggle_processing, width=15,
+                                      bg='light green', font=("Helvetica", 13))
         self.start_button.grid(row=2, column=3, sticky=tk.E, pady=(10, 0))
 
         for child in self.frame.winfo_children():
@@ -182,11 +184,13 @@ class DataPreprocessor:
                 return
 
             if not os.path.isdir(input_folder):
-                self.log_message(f"Error: The input directory '{input_folder}' does not exist or is not a directory.", "error")
+                self.log_message(f"Error: The input directory '{input_folder}' does not exist or is not a directory.",
+                                 "error")
                 return
 
             if not os.path.isdir(output_folder):
-                self.log_message(f"Error: The output directory '{output_folder}' does not exist or is not a directory.", "error")
+                self.log_message(f"Error: The output directory '{output_folder}' does not exist or is not a directory.",
+                                 "error")
                 return
 
             self.set_log_file(output_folder)
@@ -212,7 +216,8 @@ class DataPreprocessor:
 
                 id_match = re.match(r'^(\d+)', xlsx_file)
                 if not id_match:
-                    self.log_message(f"Warning: The file '{xlsx_file}' does not have a valid ID in its name.", "warning")
+                    self.log_message(f"Warning: The file '{xlsx_file}' does not have a valid ID in its name.",
+                                     "warning")
                     continue
 
                 room_id = id_match.group(1)
@@ -248,8 +253,8 @@ class DataPreprocessor:
                 self.log_message("Loading data... [COMPLETED]", "success")
                 self.log_message("Preprocessing data... [STARTED]", "info")
 
-                output_path_stopword = '../Dataset/Root/data_preprocessing_stopwords_project.csv'
-                vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=output_path_stopword, multi_label=self.multi_label)
+                vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=self.output_path_stopword,
+                                                                        multi_label=self.multi_label)
                 df_preprocess = vietnameseTextPreprocessor.process_df(combined_df, self.name_input, self.name_label)
 
                 if self.stop_event.is_set() or self.app_closing:
@@ -265,24 +270,25 @@ class DataPreprocessor:
                 vectorization = Vectorization()
                 X_vector = vectorization.fit_transform(X, self.min_df)
 
-                #lưu lại file csv vector hoá
-                preprocess_output_path = f'{self.output_entry.get()}/{self.name_file_vector_data}'
-                df = pd.DataFrame(X_vector.toarray(), columns=vectorization.get_feature_names_out())
-                df['Label'] = y
-                df.to_csv(preprocess_output_path, index=False)
-                self.log_message(f"Vectorizer data saved to '{preprocess_output_path}'", "success")
                 #Lưu lại model vector
                 vectorizer_model_path = f'{self.output_entry.get()}/{self.name_file_vectorizer}'
                 vectorization.save_model(vectorizer_model_path)
                 self.log_message("Vectorizing data... [COMPLETED]", "success")
                 self.log_message(f"Vectorizer model saved to '{vectorizer_model_path}'", "success")
 
+                # lưu lại file csv vector hoá
+                preprocess_output_path = f'{self.output_entry.get()}/{self.name_file_vector_data}'
+                df = pd.DataFrame(X_vector.toarray(), columns=vectorization.get_feature_names_out())
+                df['Label'] = y
+                df.to_csv(preprocess_output_path, index=False)
+                self.log_message(f"Vectorizer data saved to '{preprocess_output_path}'", "success")
+
                 if self.stop_event.is_set() or self.app_closing:
                     self.log_message("Processing stopped by user.", "error")
                     return
 
                 self.log_message("Training SVM model... [STARTED]", "info")
-                model_svm = Model_SVM()
+                model_svm = SVM()
                 model_svm.fit(X_vector, y)
                 svm_model_path = f'{self.output_entry.get()}/{self.name_file_svm}'
                 model_svm.save_model(svm_model_path)
