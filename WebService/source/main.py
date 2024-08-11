@@ -4,25 +4,22 @@ import uvicorn
 import os
 import sys
 
+from starlette.middleware.cors import CORSMiddleware
+
 from SVM import SVM
 from Vectorization import Vectorization
 from VietnameseTextPreprocessor import VietnameseTextPreprocessor
 
 
-# Cập nhật đường dẫn tương đối khi đóng gói ứng dụng
+# Cập nhật đường dẫn tương đ[ối khi đóng gói ứng dụng
 def get_asset_path(filename):
-    if getattr(sys, 'frozen', False):
-        # Nếu ứng dụng đang chạy trong chế độ đóng gói
-        return os.path.join(sys._MEIPASS, 'assets', filename)
-    else:
-        # Nếu ứng dụng đang chạy trong môi trường phát triển
-        return os.path.join('assets', filename)
+    return os.path.join('../assets', filename)
 
 # Kiểm tra và tải mô hình
 def check_and_load_models():
     # Đường dẫn tới các file mô hình
-    tfidf_model_path = get_asset_path('tfidf.model.txt')
-    svm_model_path = get_asset_path('svm.model.txt')
+    tfidf_model_path = get_asset_path('tfidf.model')
+    svm_model_path = get_asset_path('svm.model')
     stopwords_path = get_asset_path('stopwords_project.txt')
 
     # Kiểm tra và tải mô hình TF-IDF
@@ -72,22 +69,33 @@ if None in [vietnameseTextPreprocessor, vectorization, svm_model]:
     print("Failed to load models. Exiting...")
     sys.exit(1)  # Dừng chương trình nếu không tải được mô hình
 
-app = FastAPI()
-
-
 class TextInput(BaseModel):
     text: str
 
+origins = [
+    "http://localhost:8080",
+    # Bạn có thể thêm các nguồn gốc khác vào đây nếu cần
+]
 
+app = FastAPI()
+
+# Thêm CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Cho phép tất cả các phương thức (GET, POST, PUT, DELETE, v.v.)
+    allow_headers=["*"],  # Cho phép tất cả các header
+)
+
+# Các route và logic còn lại của bạn
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
-
 
 @app.post('/predict/')
 async def predict(request: TextInput):
@@ -101,7 +109,6 @@ async def predict(request: TextInput):
         'text': text,
         'predict': prediction_proba
     }
-
 
 if __name__ == "__main__":
     print("Starting FastAPI server...")
