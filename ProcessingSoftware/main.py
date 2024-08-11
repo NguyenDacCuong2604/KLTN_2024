@@ -8,17 +8,24 @@ import threading
 import datetime
 import logging
 import configparser
+import sys
 
 from SVM import SVM
 from Vectorization import Vectorization
 from VietnameseTextPreprocessor import VietnameseTextPreprocessor
 
+
 def read_config_general():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    config_file_path = os.path.join(base_path, 'config.ini')
     # Read the configuration file
-    config.read('config.ini', encoding='utf-8')
+    config.read(config_file_path, encoding='utf-8')
 
     # Access values from the configuration file
     log_file_name = config.get('General', 'log_file_name')
@@ -26,12 +33,19 @@ def read_config_general():
     label_df_name = config.get('General', 'label_df_name')
     return log_file_name, input_df_name, label_df_name
 
+
 def read_config_preprocessing():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    config_file_path = os.path.join(base_path, 'config.ini')
     # Read the configuration file
-    config.read('config.ini', encoding='utf-8')
+    config.read(config_file_path, encoding='utf-8')
 
     # Access values from the configuration file
     multi_label = config.getboolean('Preprocessing', 'multi_label')
@@ -44,12 +58,19 @@ def read_config_preprocessing():
 
     return multi_label, stopword_path, is_remove_np, required_columns, input_column_name, label_column_name
 
+
 def read_config_vectoration():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    config_file_path = os.path.join(base_path, 'config.ini')
     # Read the configuration file
-    config.read('config.ini', encoding='utf-8')
+    config.read(config_file_path, encoding='utf-8')
 
     # Access values from the configuration file
     data_vector_file_name = config.get('Vectorization', 'data_vector_file_name')
@@ -58,12 +79,19 @@ def read_config_vectoration():
 
     return data_vector_file_name, vectorizer_file_name, min_tf
 
+
 def read_config_svm():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    config_file_path = os.path.join(base_path, 'config.ini')
     # Read the configuration file
-    config.read('config.ini')
+    config.read(config_file_path, encoding='utf-8')
 
     # Access values from the configuration file
     svm_file_name = config.get('SVM', 'svm_file_name')
@@ -75,10 +103,18 @@ def read_config_svm():
     return svm_file_name, C, kernel, gamma, probability
 
 
-
 # Tkinter GUI class
 class DataPreprocessor:
     def __init__(self, root):
+        self.model_svm = None
+        self.svm_file_name = None
+        self.vietnameseTextPreprocessor = None
+        self.input_column_name = None
+        self.label_column_name = None
+        self.required_columns = None
+        self.label_df_name = None
+        self.input_df_name = None
+        self.log_file_name = None
         self.root = root
         self.root.title("Data Preprocessor")
 
@@ -158,7 +194,21 @@ class DataPreprocessor:
         self.logger.setLevel(logging.DEBUG)
         self.log_file_handler = None
 
-        self.log_file_name, self.input_df_name, self.label_df_name = read_config_general()
+        self.read_config()
+
+    def read_config(self):
+        try:
+            self.log_file_name, self.input_df_name, self.label_df_name = read_config_general()
+            multi_label, stopword_path, is_remove_np, self.required_columns, self.input_column_name, self.label_column_name = read_config_preprocessing()
+            self.vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=stopword_path,
+                                                                         multi_label=multi_label,
+                                                                         is_remove_np=is_remove_np)
+            self.svm_file_name, C, kernel, gamma, probability = read_config_svm()
+            self.model_svm = SVM(kernel=kernel, C=C, gamma=gamma, probability=probability)
+        except Exception as e:
+            self.log_message(f"Error reading configuration: {str(e)}", "error")
+            self.stop_event.set()
+            self.start_button.config(state=tk.DISABLED)
 
     def set_log_file(self, output_folder):
         if self.log_file_handler:
@@ -245,8 +295,6 @@ class DataPreprocessor:
 
             self.set_log_file(output_folder)
 
-            multi_label, stopword_path, is_remove_np, required_columns, input_column_name, label_column_name = read_config_preprocessing()
-
             xlsx_files = [f for f in os.listdir(input_folder) if f.endswith('.xlsx')]
             if not xlsx_files:
                 self.log_message(f"No .xlsx files found in the input directory '{input_folder}'.", "error")
@@ -280,14 +328,14 @@ class DataPreprocessor:
                         f"File '{xlsx_file}' loaded with {dataframe.shape[0]} rows and {dataframe.shape[1]} columns.",
                         "info")
 
-                    missing_columns = [col for col in required_columns if col not in dataframe.columns]
+                    missing_columns = [col for col in self.required_columns if col not in dataframe.columns]
                     if missing_columns:
                         self.log_message(
                             f"Warning: The file '{xlsx_file}' is missing the following required columns: {', '.join(missing_columns)}.",
                             "warning")
                     else:
-                        dataframe[label_column_name] = room_id
-                        combined_data.append(dataframe[[input_column_name, label_column_name]])
+                        dataframe[self.label_column_name] = room_id
+                        combined_data.append(dataframe[[self.input_column_name, self.label_column_name]])
                         self.log_message(f"File '{xlsx_file}' processed successfully with {dataframe.shape[0]} rows.",
                                          "success")
                 except Exception as e:
@@ -303,9 +351,9 @@ class DataPreprocessor:
                 self.log_message("Loading data... [COMPLETED]", "success")
                 self.log_message("Preprocessing data... [STARTED]", "info")
 
-                vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=stopword_path,
-                                                                        multi_label=multi_label, is_remove_np=is_remove_np)
-                df_preprocess = vietnameseTextPreprocessor.process_df(combined_df, input_column_name, label_column_name, self.input_df_name, self.label_df_name)
+                df_preprocess = self.vietnameseTextPreprocessor.process_df(combined_df, self.input_column_name,
+                                                                           self.label_column_name, self.input_df_name,
+                                                                           self.label_df_name)
 
                 if self.stop_event.is_set() or self.app_closing:
                     self.log_message("Processing stopped by user.", "error")
@@ -329,23 +377,22 @@ class DataPreprocessor:
                 self.log_message(f"Vectorizer model saved to '{vectorizer_model_path}'", "success")
 
                 # lưu lại file csv vector hoá
+                self.log_message("Save Vectorizer data... [STARTED]", "info")
                 preprocess_output_path = f'{self.output_entry.get()}/{data_vector_file_name}'
                 df = pd.DataFrame(X_vector.toarray(), columns=vectorization.get_feature_names_out())
                 df[self.label_df_name] = y
                 df.to_csv(preprocess_output_path, index=False)
+                self.log_message("Save Vectorizing data... [COMPLETED]", "success")
                 self.log_message(f"Vectorizer data saved to '{preprocess_output_path}'", "success")
 
                 if self.stop_event.is_set() or self.app_closing:
                     self.log_message("Processing stopped by user.", "error")
                     return
 
-                svm_file_name, C, kernel, gamma, probability = read_config_svm()
-
                 self.log_message("Training SVM model... [STARTED]", "info")
-                model_svm = SVM(kernel = kernel, C = C, gamma = gamma, probability = probability)
-                model_svm.fit(X_vector, y)
-                svm_model_path = f'{self.output_entry.get()}/{svm_file_name}'
-                model_svm.save_model(svm_model_path)
+                self.model_svm.fit(X_vector, y)
+                svm_model_path = f'{self.output_entry.get()}/{self.svm_file_name}'
+                self.model_svm.save_model(svm_model_path)
                 self.log_message("Training SVM model... [COMPLETED]", "success")
                 self.log_message(f"SVM model saved to '{svm_model_path}'", "success")
 
@@ -360,6 +407,7 @@ class DataPreprocessor:
                 return
         except Exception as e:
             self.log_message(f"Error: An error occurred: {e}", "error")
+            self.start_button.config(state=tk.DISABLED)
         finally:
             self.processing = False
             if not self.app_closing:

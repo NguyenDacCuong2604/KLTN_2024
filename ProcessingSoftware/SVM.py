@@ -8,7 +8,29 @@ class SVM:
         self.gamma = gamma
         self.C = C
         self.probability = probability
+        self.model = None
+
+        self.validate_parameters()
         self.model = SVC(kernel=self.kernel, gamma=self.gamma, C=self.C, probability=self.probability)
+
+    def validate_parameters(self):
+        # Validate kernel
+        valid_kernels = ['linear', 'poly', 'rbf', 'sigmoid']
+        if self.kernel not in valid_kernels and not callable(self.kernel):
+            raise ValueError(f"Invalid kernel: {self.kernel}. Must be one of {valid_kernels} or a callable.")
+
+        # Validate gamma
+        if self.gamma not in ['scale', 'auto']:
+            if not isinstance(self.gamma, (int, float)) or self.gamma <= 0:
+                raise ValueError(f"Invalid gamma: {self.gamma}. Must be 'scale', 'auto', or a positive number.")
+
+        # Validate C
+        if not isinstance(self.C, (int, float)) or self.C <= 0:
+            raise ValueError(f"Invalid C: {self.C}. Must be a positive number.")
+
+        # Validate probability
+        if not isinstance(self.probability, bool):
+            raise ValueError(f"Invalid probability: {self.probability}. Must be a boolean.")
 
     def fit(self, X, y):
         return self.model.fit(X, y)
