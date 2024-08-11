@@ -1,2 +1,0 @@
-B1: Copy 2 file svm.model và tfidf.model từ phần mềm tiền xử lý vào folder Model
-B2: Chạy file setup_and_run.bat

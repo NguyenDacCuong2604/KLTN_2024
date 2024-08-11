@@ -1,4 +1,9 @@
-import requests
+import pyvi
+import os
+import sklearn_crfsuite
+import pycrfsuite
+import tqdm
 
-requests = requests.get('http://127.0.0.1:8000')
-print(requests.json())
+# Lấy đường dẫn đến thư mục cài đặt của thư viện pyvi
+pyvi_path = os.path.dirname(pycrfsuite.__file__)
+print(pyvi_path)
