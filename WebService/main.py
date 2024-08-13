@@ -15,11 +15,14 @@ from VietnameseTextPreprocessor import VietnameseTextPreprocessor
 def read_config_file():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
-    if hasattr(sys, '_MEIPASS'):
-        base_path = sys._MEIPASS
+    if getattr(sys, 'frozen', False):
+        # Nếu chạy từ file .exe đã đóng gói
+        application_path = os.path.dirname(sys.executable)
     else:
-        base_path = os.path.abspath(".")
-    config_file_path = os.path.join(base_path, 'config.ini')
+        # Nếu chạy từ mã nguồn
+        application_path = os.path.dirname(__file__)
+
+    config_file_path = os.path.join(application_path, 'config.ini')
     # Read the configuration file
     config.read(config_file_path, encoding='utf-8')
     stopwords_project_path = config.get('General', 'stopwords_project_path')
@@ -30,11 +33,14 @@ def read_config_file():
 def read_config_CORS():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
-    if hasattr(sys, '_MEIPASS'):
-        base_path = sys._MEIPASS
+    if getattr(sys, 'frozen', False):
+        # Nếu chạy từ file .exe đã đóng gói
+        application_path = os.path.dirname(sys.executable)
     else:
-        base_path = os.path.abspath(".")
-    config_file_path = os.path.join(base_path, 'config.ini')
+        # Nếu chạy từ mã nguồn
+        application_path = os.path.dirname(__file__)
+
+    config_file_path = os.path.join(application_path, 'config.ini')
     # Read the configuration file
     config.read(config_file_path, encoding='utf-8')
     allow_origins_str = config.get('CORS', 'allow_origins')
