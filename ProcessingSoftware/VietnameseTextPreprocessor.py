@@ -1,13 +1,19 @@
 import re
 import pandas as pd
 from pyvi import ViTokenizer, ViPosTagger
+from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class VietnameseTextPreprocessor:
-    def __init__(self, path_stopwords=None, multi_label=True, is_remove_np=True):
+    def __init__(self, path_stopwords=None, multi_label=True, is_remove_np=True, using_k_means=False, k=10,
+                 count_data_per_label=2000):
         self.multi_label = multi_label
         self.stopwords = self.load_stopwords(path_stopwords)
         self.is_remove_np = is_remove_np
+        self.using_k_means = using_k_means
+        self.k = k
+        self.count_data_per_label = count_data_per_label
         self.dicchar = self.loaddictchar()
         self.bang_nguyen_am = [['a', 'à', 'á', 'ả', 'ã', 'ạ'],
                                ['ă', 'ằ', 'ắ', 'ẳ', 'ẵ', 'ặ'],
@@ -167,7 +173,7 @@ class VietnameseTextPreprocessor:
 
     def process_text(self, text):
         text = self.chuan_hoa_dau_cau_tieng_viet(
-            text)  # Chuẩn hóa dấu câu tiếng việt và chuyển đổi Windown1525 thành UTF8
+            str(text))  # Chuẩn hóa dấu câu tiếng việt và chuyển đổi Windown1525 thành UTF8
         text = text.replace('_x000D_',
                             '')  # _x000D_ là mã Unicode biểu diễn ký tự xuống dòng (CR-Carriage Return) (Cái này khi up file excel, mở bằng GG Sheets sẽ bị ở những chổ xuống dòng dữ liệu '\n')
 
@@ -222,6 +228,35 @@ class VietnameseTextPreprocessor:
 
         return duplicated_data.drop(filtered_data.index)  # Dữ liệu mà trích yếu có nhiều nhãn
 
+    def get_data_k_means(self, df, column_input_name, column_label_name):
+        final_df = pd.DataFrame()
+        for label in df[column_label_name].unique():
+            subset = df[df[column_label_name] == label]
+
+            if subset.shape[0] < self.count_data_per_label:
+                final_df = pd.concat([final_df, subset])
+                continue
+
+            ratio = self.count_data_per_label / subset.shape[0]
+
+            tfidf_vectorizer = TfidfVectorizer()
+            X_text = tfidf_vectorizer.fit_transform(subset[column_input_name])
+            kmeans = KMeans(n_clusters=self.k, n_init=10, random_state=42)
+            kmeans.fit(X_text)
+            labels = kmeans.labels_
+            subset['Cluster'] = labels
+
+            for cluster in range(self.k):
+                cluster_data = subset[subset['Cluster'] == cluster]
+                n_samples = int(ratio * cluster_data.shape[0])
+                if n_samples > 0:
+                    sampled_data = cluster_data.sample(n=n_samples, random_state=42)
+                    final_df = pd.concat([final_df, sampled_data])
+                else:
+                    final_df = pd.concat([final_df, cluster_data])
+
+        return final_df
+
     def process_df(self, df, column_input, column_label, column_input_name, column_label_name):
         df.dropna(inplace=True)
         if not self.multi_label:
@@ -230,6 +265,7 @@ class VietnameseTextPreprocessor:
 
         df[column_input_name] = df[column_input].apply(lambda x: self.process_text(x))
         df[column_label_name] = df[column_label]
+        if self.using_k_means:
+            df = self.get_data_k_means(df, column_input_name, column_label_name)
         result_df = df[[column_input_name, column_label_name]]
         return result_df
-

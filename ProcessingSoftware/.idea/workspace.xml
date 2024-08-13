@@ -5,13 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3047abdc-91ac-41f3-944c-2c154558e8e3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VietnameseTextPreprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/VietnameseTextPreprocessor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/ProcessingSoftware.rar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/ProcessingSoftware.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Project/.idea/Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Project/.idea/Project.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Project/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Project/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Project/Code/Test_API.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Project/Code/Test_API.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +54,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.VietnameseTextPreprocessor.executor&quot;: &quot;Run&quot;,
     &quot;Python.main (1).executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -74,6 +75,29 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.main (1)">
+    <configuration name="VietnameseTextPreprocessor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="ProcessingSoftware" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/VietnameseTextPreprocessor.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ProcessingSoftware" />
       <option name="ENV_FILES" value="" />
@@ -123,6 +147,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main (1)" />
+        <item itemvalue="Python.VietnameseTextPreprocessor" />
         <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
@@ -148,6 +173,8 @@
       <workItem from="1723253556867" duration="698000" />
       <workItem from="1723360390838" duration="10118000" />
       <workItem from="1723373150626" duration="39000" />
+      <workItem from="1723517741948" duration="1919000" />
+      <workItem from="1723520073881" duration="201000" />
     </task>
     <servers />
   </component>
@@ -156,6 +183,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ProcessingSoftware$main.coverage" NAME="main Coverage Results" MODIFIED="1723253591954" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Source" />
-    <SUITE FILE_PATH="coverage/ProcessingSoftware$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1723370920536" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ProcessingSoftware$VietnameseTextPreprocessor.coverage" NAME="VietnameseTextPreprocessor Coverage Results" MODIFIED="1723519094287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ProcessingSoftware$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1723519306038" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

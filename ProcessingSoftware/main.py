@@ -19,11 +19,14 @@ def read_config_general():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
-    if hasattr(sys, '_MEIPASS'):
-        base_path = sys._MEIPASS
+    if getattr(sys, 'frozen', False):
+        # Nếu chạy từ file .exe đã đóng gói
+        application_path = os.path.dirname(sys.executable)
     else:
-        base_path = os.path.abspath(".")
-    config_file_path = os.path.join(base_path, 'config.ini')
+        # Nếu chạy từ mã nguồn
+        application_path = os.path.dirname(__file__)
+
+    config_file_path = os.path.join(application_path, 'config.ini')
     # Read the configuration file
     config.read(config_file_path, encoding='utf-8')
 
@@ -38,12 +41,14 @@ def read_config_preprocessing():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
-    if hasattr(sys, '_MEIPASS'):
-        base_path = sys._MEIPASS
+    if getattr(sys, 'frozen', False):
+        # Nếu chạy từ file .exe đã đóng gói
+        application_path = os.path.dirname(sys.executable)
     else:
-        base_path = os.path.abspath(".")
+        # Nếu chạy từ mã nguồn
+        application_path = os.path.dirname(__file__)
 
-    config_file_path = os.path.join(base_path, 'config.ini')
+    config_file_path = os.path.join(application_path, 'config.ini')
     # Read the configuration file
     config.read(config_file_path, encoding='utf-8')
 
@@ -55,20 +60,24 @@ def read_config_preprocessing():
     required_columns = [column.strip() for column in required_columns_str.split(';')]
     input_column_name = config.get('Preprocessing', 'input_column_name')
     label_column_name = config.get('Preprocessing', 'label_column_name')
-
-    return multi_label, stopword_path, is_remove_np, required_columns, input_column_name, label_column_name
+    using_k_means = config.getboolean('Preprocessing', 'using_k_means')
+    k = config.getint('Preprocessing', 'k')
+    count_data_per_label = config.getint('Preprocessing', 'count_data_per_label')
+    return multi_label, stopword_path, is_remove_np, required_columns, input_column_name, label_column_name, using_k_means, k, count_data_per_label
 
 
 def read_config_vectoration():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
-    if hasattr(sys, '_MEIPASS'):
-        base_path = sys._MEIPASS
+    if getattr(sys, 'frozen', False):
+        # Nếu chạy từ file .exe đã đóng gói
+        application_path = os.path.dirname(sys.executable)
     else:
-        base_path = os.path.abspath(".")
+        # Nếu chạy từ mã nguồn
+        application_path = os.path.dirname(__file__)
 
-    config_file_path = os.path.join(base_path, 'config.ini')
+    config_file_path = os.path.join(application_path, 'config.ini')
     # Read the configuration file
     config.read(config_file_path, encoding='utf-8')
 
@@ -84,12 +93,14 @@ def read_config_svm():
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
-    if hasattr(sys, '_MEIPASS'):
-        base_path = sys._MEIPASS
+    if getattr(sys, 'frozen', False):
+        # Nếu chạy từ file .exe đã đóng gói
+        application_path = os.path.dirname(sys.executable)
     else:
-        base_path = os.path.abspath(".")
+        # Nếu chạy từ mã nguồn
+        application_path = os.path.dirname(__file__)
 
-    config_file_path = os.path.join(base_path, 'config.ini')
+    config_file_path = os.path.join(application_path, 'config.ini')
     # Read the configuration file
     config.read(config_file_path, encoding='utf-8')
 
@@ -199,10 +210,10 @@ class DataPreprocessor:
     def read_config(self):
         try:
             self.log_file_name, self.input_df_name, self.label_df_name = read_config_general()
-            multi_label, stopword_path, is_remove_np, self.required_columns, self.input_column_name, self.label_column_name = read_config_preprocessing()
+            multi_label, stopword_path, is_remove_np, self.required_columns, self.input_column_name, self.label_column_name, using_k_means, k, count_data_per_label = read_config_preprocessing()
             self.vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=stopword_path,
                                                                          multi_label=multi_label,
-                                                                         is_remove_np=is_remove_np)
+                                                                         is_remove_np=is_remove_np, using_k_means=using_k_means, k=k, count_data_per_label = count_data_per_label)
             self.svm_file_name, C, kernel, gamma, probability = read_config_svm()
             self.model_svm = SVM(kernel=kernel, C=C, gamma=gamma, probability=probability)
         except Exception as e:
@@ -355,6 +366,9 @@ class DataPreprocessor:
                                                                            self.label_column_name, self.input_df_name,
                                                                            self.label_df_name)
 
+                self.log_message(f"Preprocessed Dataframe created with {len(df_preprocess)} entries.", "info")
+                self.log_message(f"Columns in preprocessed Dataframe: {df_preprocess.columns.tolist()}", "info")
+
                 if self.stop_event.is_set() or self.app_closing:
                     self.log_message("Processing stopped by user.", "error")
                     return
@@ -380,7 +394,7 @@ class DataPreprocessor:
                 self.log_message("Save Vectorizer data... [STARTED]", "info")
                 preprocess_output_path = f'{self.output_entry.get()}/{data_vector_file_name}'
                 df = pd.DataFrame(X_vector.toarray(), columns=vectorization.get_feature_names_out())
-                df[self.label_df_name] = y
+                df[str(self.label_df_name).upper()] = y
                 df.to_csv(preprocess_output_path, index=False)
                 self.log_message("Save Vectorizing data... [COMPLETED]", "success")
                 self.log_message(f"Vectorizer data saved to '{preprocess_output_path}'", "success")
