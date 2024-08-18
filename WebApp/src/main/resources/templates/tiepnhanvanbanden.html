@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiếp nhận văn bản - Sở Nội vụ - TPHCM</title>
+    <link href="images/logo_quochuy.png" rel="Shortcut Icon">
+    <link href="/style/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <img th:src="@{/images/logo.png}" alt="Logo"/>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Nhập từ khóa tìm kiếm">
+        <button type="button"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+    <div class="user-info" onclick="toggleDropdown()">
+        <img th:src="@{/images/avatar.png}" alt="Avatar">
+        <div>
+            <span class="role" th:text="${session.user.position}"></span>
+            <br>
+            <span class="name" th:text="${session.user.name}"></span>
+        </div>
+        <div class="dropdown-menu">
+            <form th:action="@{/auth/v1/logout}" method="post" id="logoutForm">
+                <a onclick="document.getElementById('logoutForm').submit()">Thoát</a>
+            </form>
+        </div>
+    </div>
+</header>
+<nav>
+    <ul>
+        <li>
+            <a href="#">
+                <i class="fas fa-home"></i>
+            </a>
+        </li>
+        <li class="active">
+            <a th:href="@{/dashboard}">Xử lý văn bản</a>
+        </li>
+        <li>
+            <a href="#">Văn bản đến</a>
+        </li>
+        <li>
+            <a href="#">Văn bản đi</a>
+        </li>
+        <li>
+            <a href="#">Văn bản nội bộ</a>
+        </li>
+        <li>
+            <a href="#">Văn bản liên thông</a>
+        </li>
+        <li>
+            <a href="#">Tra cứu</a>
+        </li>
+    </ul>
+</nav>
+<div class="sub-menu">
+    <ul class="child-menu">
+        <li class="active">
+            <a>▸Tiếp nhận văn bản đến (Alt+1)</a>
+        </li>
+        <li>
+            <a>▸Hộp thư văn bản đến (Alt+2)</a>
+        </li>
+        <li>
+            <a>▸Dự thảo văn bản (Alt+3)</a>
+        </li>
+        <li>
+            <a>▸Phát hành văn bản (Alt+4)</a>
+        </li>
+        <li>
+            <a>▸Văn bản chờ phát hành (Alt+5)</a>
+        </li>
+        <li>
+            <a>▸Soạn văn bản nội bộ (Alt+6)</a>
+        </li>
+    </ul>
+</div>
+<div style="background-color: #007bff; padding:8px;">
+    <h2 style="color: white; padding-left: 8px; margin: 0;">Tiếp nhận văn bản đến</h2>
+</div>
+
+<div class="sub-option">
+    <ul class="child-option">
+        <li>
+            <a id="saveAndSubmit"><i class="fa-solid fa-file"></i> Lưu và nhập văn bản</a>
+        </li>
+        <li>
+            <a id="saveAndTrinhChanhVP"><i class="fa-solid fa-file-export"></i> Lưu và Trình Chánh VP</a>
+        </li>
+        <li>
+            <a><i class="fa-solid fa-file"></i> Thêm mới(Giống VB trước)</a>
+        </li>
+        <li>
+            <a><i class="fa-solid fa-link"></i> Liên kết</a>
+        </li>
+        <li>
+            <a><i class="fa-solid fa-square-pen"></i> Nhập lại</a>
+        </li>
+    </ul>
+</div>
+
+<div class="content">
+    <form id="addDocumentForm" style="padding-top: 12px;" method="post" th:action="@{/documents/luuvanban}" enctype="multipart/form-data" th:object="${documentForm}" >
+        <div class="form-group">
+            <div class="left">
+                <label>Số văn bản <span class="required">(*)</span></label>
+                <input type="text" name="documentNumber" placeholder="Nhập tên hoặc mã" required>
+            </div>
+            <div class="right">
+                <label>Văn bản QPPL</label>
+                <input type="checkbox" name="isLegalDocument" value="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Số đến <span class="required">(*)</span></label>
+                <input type="text" name="arrivalNumber" required>
+            </div>
+            <div class="right">
+                <label>Ngày đến</label>
+                <input type="datetime-local" name="arrivalDate" required id="arrivalDate">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Số ký hiệu của văn bản <span class="required">(*)</span></label>
+                <input type="text" name="documentSymbol" required>
+            </div>
+            <div class="right">
+                <label>Ngày ban hành</label>
+                <input type="date" name="issueDate" required id="issueDate">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Cơ quan ban hành <span class="required">(*)</span></label>
+                <input type="text" name="issuingAgency" required>
+            </div>
+            <div class="right">
+                <label>Cấp cơ quan</label>
+                <input type="text" name="agencyLevel">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Loại văn bản</label>
+                <input type="text" name="documentType">
+            </div>
+            <div class="right">
+                <label>Lĩnh vực</label>
+                <input type="text" name="field">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Trích yếu <span class="required">(*)</span></label>
+                <textarea name="summary" required></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Ghi chú</label>
+                <textarea name="note"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Văn bản chỉ đạo</label>
+                <input type="checkbox" name="isDirectiveDocument" value="true">
+            </div>
+            <div class="right">
+                <label>Thời gian xử lý</label>
+                <input type="date" name="processingTime">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Có bản giấy</label>
+                <input type="checkbox" name="hasPaperCopy" value="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="left">
+                <label>Đính kèm tệp tin</label>
+                <input type="file" name="attachedFiles" multiple id="fileInput">
+            </div>
+        </div>
+        <div class="file-list" id="fileList"></div>
+    </form>
+</div>
+
+<footer class="footer">
+    <div class="left">
+        <h3>Sở Nội vụ Thành phố Hồ Chí Minh</h3>
+        <p>Địa chỉ: 86B Lê Thánh Tôn, Phường Bến Nghé, Quận 1, TP.HCM</p>
+        <p>Điện thoại: (028) 38 295 110 - Fax: (028) 38 231 489 - Email: snv@sonoivu.hochiminhcity.gov.vn</p>
+        <p>NSS eGov v5.3. Thiết kế và phát triển bởi NewSaigonSoft</p>
+    </div>
+</footer>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <p class="modal-title">Trình Chánh VP</p>
+            <span class="close"><i class="fa-solid fa-xmark"></i></span>
+        </div>
+        <div class="sub-option">
+            <ul class="child-option">
+                <li>
+                    <a id="sendButton"><i class="fa-solid fa-file-export"></i> Chuyển</a>
+                </li>
+            </ul>
+        </div>
+        <form id="nextDocumentForm" method="post" th:action="@{/documents/luuvachuyenchanhvanphong}" enctype="multipart/form-data" th:object="${documentForward}">
+            <div class="form-group">
+                <div class="left">
+                    <label style="padding: 8px;">Nội dung xử lý</label>
+                    <textarea placeholder="Nhập thông tin xử lý" name="content"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="left">
+                    <label style="padding: 8px;">Người nhận <span class="required">(*)</span></label>
+                    <table class="document-table">
+                        <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAllCheckbox">
+                            </th>
+                            <th>
+                                <p>Họ và tên</p>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="left">
+                    <label style="padding: 8px;">Người xử lý chính <span class="required">(*)</span></label>
+                    <select id="selectOptions" required name="mainReceivedUser">
+                        <option value="">Chọn một tùy chọn</option>
+                        <!-- Thymeleaf options can be populated here -->
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const form = document.getElementById('addDocumentForm');
+        function validateAndSubmitForm() {
+            // Ngăn chặn gửi biểu mẫu nếu có lỗi
+            if (form.checkValidity()) {
+                const isConfirmed = confirm('Bạn chắc chắn lưu văn bản?');
+
+                if (isConfirmed) {
+                    // Gửi biểu mẫu nếu người dùng chọn đồng ý
+                    form.submit(); // Hoặc xử lý gửi dữ liệu bằng AJAX/Fetch API ở đây
+                    alert('Form đã được gửi thành công!');
+                } else {
+                    // Nếu người dùng chọn hủy, không làm gì cả
+                    alert('Đã hủy thao tác lưu.');
+                }
+            }else {
+                event.preventDefault(); // Ngăn chặn gửi biểu mẫu
+
+                // Hiển thị thông báo lỗi
+                form.reportValidity();
+            }
+        }
+        function validateForm() {
+            // Ngăn chặn gửi biểu mẫu nếu có lỗi
+            if (form.checkValidity()) {
+                $.ajax({
+                    url: '/users/chanhvanphong',  // URL API
+                    type: 'GET',
+                    success: function(data) {
+                        // Đổ dữ liệu vào bảng trong modal
+                        const tbody = document.querySelector('.document-table tbody');
+                        tbody.innerHTML = '';  // Xóa các dòng cũ
+
+                        data.forEach(function(user) {
+                            const row = `
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="rowCheckbox" name="receivedUsers" value="${user.user.id}" data-user_name="${user.user.name}" data-user_position="${user.user.position}" data-user_id="${user.user.id}">
+                            </td>
+                            <td>
+                                <p><strong>${user.user.name}</strong> (${user.user.position})</p>
+                            </td>
+                        </tr>`;
+                            tbody.insertAdjacentHTML('beforeend', row);
+                        });
+
+                        // Hiển thị modal sau khi dữ liệu đã được load
+                        document.getElementById('modal').style.display = 'block';
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);
+                    }
+                });
+            }else {
+                event.preventDefault(); // Ngăn chặn gửi biểu mẫu
+                // Hiển thị thông báo lỗi
+                form.reportValidity();
+            }
+        }
+        document.getElementById('saveAndSubmit').addEventListener('click', function(event) {
+            event.preventDefault(); // Ngăn hành động mặc định của liên kết
+            validateAndSubmitForm()
+        });
+
+        // Gán sự kiện sau khi nội dung được cập nhật
+        document.getElementById('saveAndTrinhChanhVP').addEventListener('click', function (event) {
+            event.preventDefault();
+            validateForm()
+        });
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tính toán thời gian hiện tại theo giờ Việt Nam (UTC+7)
+        const now = new Date();
+        const offset = 7 * 60; // Giờ Việt Nam là UTC+7
+        const localTime = new Date(now.getTime() + offset * 60 * 1000);
+
+        // Định dạng ngày theo định dạng 'YYYY-MM-DD'
+        const formattedDate = localTime.toISOString().split('T')[0];
+        // Định dạng ngày giờ theo định dạng 'YYYY-MM-DDTHH:MM'
+        const formattedDateTime = localTime.toISOString().slice(0,16);
+
+        // Cập nhật giá trị cho các trường ngày
+        document.getElementById('arrivalDate').value = formattedDateTime;
+        document.getElementById('issueDate').value = formattedDate;
+    });
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = ''; // Clear the list
+
+        const dataTransfer = new DataTransfer();
+        Array.from(event.target.files).forEach((file, index) => {
+            dataTransfer.items.add(file); // Add all files to DataTransfer object
+
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+
+            const fileName = document.createElement('span');
+            fileName.textContent = file.name;
+            fileItem.appendChild(fileName);
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Xoá';
+            removeButton.addEventListener('click', () => {
+                // Remove the file from DataTransfer
+                dataTransfer.items.remove(index);
+
+                // Update the input's file list
+                event.target.files = dataTransfer.files;
+
+                // Remove the file item from the UI
+                fileItem.remove();
+            });
+            fileItem.appendChild(removeButton);
+
+            fileList.appendChild(fileItem);
+        });
+
+        // Update the input's file list
+        event.target.files = dataTransfer.files;
+    });
+
+    // Thêm sự kiện click cho nút đóng modal
+    document.querySelector('.modal .close').addEventListener('click', function() {
+        document.getElementById('modal').style.display = 'none';
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('.document-table');
+        const selectElement = document.getElementById('selectOptions');
+
+        // Delegation for row checkboxes
+        table.addEventListener('change', function(event) {
+            if (event.target.classList.contains('rowCheckbox')) {
+                const checkbox = event.target;
+                toggleHighlight(checkbox);
+                updateSelectAllCheckbox();
+                updateSelectOptions();
+            }
+        });
+
+        // Delegation for "Chọn tất cả" checkbox
+        table.addEventListener('change', function(event) {
+            if (event.target.id === 'selectAllCheckbox') {
+                const isChecked = event.target.checked;
+                const rowCheckboxes = table.querySelectorAll('.rowCheckbox');
+                rowCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                    toggleHighlight(checkbox);
+                });
+                updateSelectOptions();
+            }
+        });
+
+        // Cập nhật trạng thái của checkbox "Chọn tất cả"
+        function updateSelectAllCheckbox() {
+            const rowCheckboxes = table.querySelectorAll('.rowCheckbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allChecked = Array.from(rowCheckboxes).every(function(checkbox) {
+                return checkbox.checked;
+            });
+            selectAllCheckbox.checked = allChecked;
+        }
+
+        // Thay đổi màu nền của hàng dựa trên trạng thái checkbox
+        function toggleHighlight(checkbox) {
+            const row = checkbox.closest('tr');
+            if (checkbox.checked) {
+                row.classList.add('highlight');
+            } else {
+                row.classList.remove('highlight');
+            }
+        }
+
+        function updateSelectOptions() {
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+            const selectedUsers = new Set(); // Dùng Set để loại bỏ giá trị trùng lặp
+
+            rowCheckboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    const userId = checkbox.dataset.user_id;
+                    const userName = checkbox.dataset.user_name;
+                    const userPosition = checkbox.dataset.user_position;
+                    if (userId) {
+                        selectedUsers.add({ id: userId, name: userName, position: userPosition });
+                    }
+                }
+            });
+
+            // Xóa tất cả các tùy chọn hiện tại trong thẻ select
+            selectElement.innerHTML = '<option value="">Chọn một tùy chọn</option>';
+
+            // Thêm các tùy chọn mới vào thẻ select
+            selectedUsers.forEach(function(user) {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.name} (${user.position})`;
+                selectElement.appendChild(option);
+            });
+        }
+
+        function validateNextDocumentForm() {
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+            var checkboxesChecked = Array.from(rowCheckboxes).some(checkbox => checkbox.checked);
+            var selectOptionSelected = selectElement.value !== '';
+
+            if (!checkboxesChecked) {
+                alert('Vui lòng chọn ít nhất một người nhận.');
+                return false;
+            }
+
+            if (!selectOptionSelected) {
+                alert('Vui lòng chọn người xử lý chính.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Thêm sự kiện click cho nút "Chuyển"
+        document.getElementById('sendButton').addEventListener('click', function() {
+            if (validateNextDocumentForm()) {
+                const isConfirmed = confirm('Bạn chắc chắn chuyển chánh văn phòng?');
+
+                if (isConfirmed) {
+                    const addDocumentForm = new FormData(document.getElementById('addDocumentForm'));
+                    const nextDocumentForm = new FormData(document.getElementById('nextDocumentForm'));
+
+                    // Tạo FormData mới để kết hợp dữ liệu từ cả hai form
+                    const combinedFormData = new FormData();
+
+                    // Thêm dữ liệu từ addDocumentForm vào combinedFormData
+                    addDocumentForm.forEach((value, key) => {
+                        combinedFormData.append(key, value);
+                    });
+
+                    // Thêm dữ liệu từ nextDocumentForm vào combinedFormData
+                    nextDocumentForm.forEach((value, key) => {
+                        combinedFormData.append(key, value);
+                    });
+
+                    // Gửi dữ liệu kết hợp đến server
+                    fetch('/documents/luuvachuyenchanhvanphong', {
+                        method: 'POST',
+                        body: combinedFormData
+                    }).then(response => {
+                        if (response.redirected) {
+                            // Xử lý redirect nếu cần
+                            alert('Đã lưu và chuyển văn bản xử lý.');
+                            window.location.href = response.url;
+                        } else {
+                            return response.json(); // Xử lý phản hồi JSON nếu cần
+                        }
+                    })
+                        .catch(error => {
+                        // Xử lý lỗi nếu cần, mặc dù bạn không cần phải xử lý phản hồi
+                        console.error('Error:', error);
+                    });
+                } else {
+                    // Nếu người dùng chọn hủy, không làm gì cả
+                    alert('Đã hủy thao tác lưu.');
+                }
+            }
+
+        });
+
+
+    });
+</script>
+<script src="/js/script.js"></script>

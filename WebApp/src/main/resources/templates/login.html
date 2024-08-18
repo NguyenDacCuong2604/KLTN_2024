@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sở Nội vụ - TPHCM</title>
+    <link href="/images/logo_quochuy.png" rel="Shortcut Icon">
+    <style>
+        /* Custom styles to match theamyleaf */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url('/images/background_login.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            transition: box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .container img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .container label {
+            display: block;
+            font-weight: 600;
+            color: #555555;
+            margin-bottom: 8px;
+        }
+
+        .container input {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .container button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .container button:hover {
+            background-color: #0056b3;
+        }
+
+        .container .empty {
+            padding: 28px;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="/images/bgfrm_login.jpg">
+    <div class="empty"></div>
+    <form th:action="@{/auth/v1/login}" th:object="${loginForm}" method="post">
+        <div>
+            <label for="username">Tên đăng nhập</label>
+            <input type="text" id="username" th:field="*{username}" placeholder="Nhập tên đăng nhập" required>
+        </div>
+        <div>
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="Nhập mật khẩu" required>
+        </div>
+        <div th:if="${session.error}" class="error">
+            <p th:text="${session.error}">Error message</p>
+        </div>
+        <button type="submit">Đăng nhập</button>
+        <p th:if="${param.logout}">You have been logged out successfully.</p>
+    </form>
+</div>
+</body>
+</html>

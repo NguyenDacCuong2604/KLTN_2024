@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xử lý văn bản - Sở Nội vụ - TPHCM</title>
+    <link href="/images/logo_quochuy.png" rel="Shortcut Icon">
+    <link href="/style/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<body>
+<header>
+    <div class="logo">
+        <img th:src="@{/images/logo.png}" />
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Nhập từ khóa tìm kiếm">
+        <button type="button"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+    <div class="user-info" onclick="toggleDropdown()">
+        <img th:src="@{/images/avatar.png}" alt="Avatar">
+        <div>
+            <span class="role" th:text="${session.user.position}"></span>
+            <br>
+            <span class="name" th:text="${session.user.name}"></span>
+        </div>
+        <div class="dropdown-menu">
+            <form th:action="@{/auth/v1/logout}" method="post" id="logoutForm">
+                <a onclick="document.getElementById('logoutForm').submit()">Thoát</a>
+            </form>
+        </div>
+    </div>
+</header>
+<nav>
+    <ul>
+        <li>
+            <a href="#">
+                <i class="fas fa-home"></i>
+            </a>
+        </li>
+        <li class="active">
+            <a href="#" th:href="@{/dashboard}">Xử lý văn bản</a>
+        </li>
+        <li>
+            <a href="#">Văn bản đến</a>
+        </li>
+        <li>
+            <a href="#">Văn bản đi</a>
+        </li>
+        <li>
+            <a href="#">Văn bản nội bộ</a>
+        </li>
+        <li>
+            <a href="#">Văn bản liên thông</a>
+        </li>
+        <li>
+            <a href="#">Tra cứu</a>
+        </li>
+    </ul>
+</nav>
+<div class="sub-menu">
+    <ul class="child-menu">
+        <li>
+            <a th:href="@{/xulyvanban}">▸Tiếp nhận văn bản đến (Alt+1)</a>
+        </li>
+        <li>
+            <a href="#">▸Hộp thư văn bản đến (Alt+2)</a>
+        </li>
+        <li>
+            <a href="#">▸Dự thảo văn bản (Alt+3)</a>
+        </li>
+        <li>
+            <a href="#">▸Phát hành văn bản (Alt+4)</a>
+        </li>
+        <li>
+            <a href="#">▸Văn bản chờ phát hành (Alt+5)</a>
+        </li>
+        <li>
+            <a href="#">▸Soạn văn bản nội bộ (Alt+6)</a>
+        </li>
+    </ul>
+</div>
+<div class="content">
+    <div class="content-left">
+        <h2 style="margin: 0; padding: 8px">Công việc của tôi</h2>
+        <select id="tinhtrang" style="font-size: 16px; font-weight: bold; padding: 8px; width: 100%;">
+            <option value="1">Văn bản chưa xử lý</option>
+            <option value="2">Văn bản đã xử lý</option>
+        </select>
+        <ul style="padding-top: 12px;">
+            <li th:each="vanban : ${vanbans}"
+                class="van-ban-item"
+                th:attr="id=${vanban.document.id},data-status=${vanban.statement.status},data-so-van-ban=${vanban.document.soVanBan}, data-so-den=${vanban.document.soDen}, data-so-ky-hieu=${vanban.document.soKiHieuVanBan}, data-co-quan-ban-hanh=${vanban.document.coQuanBanHanh}, data-loai-van-ban=${vanban.document.loaiVanBan}, data-ngay-den=${vanban.document.ngayDen}, data-ngay-ban-hanh=${vanban.document.ngayBanHanh}, data-trich-yeu=${vanban.document.trichYeu}">
+                <div class="van-ban">
+                    <p class="thoi-gian-tao" th:text="${vanban.document.ngayDen}"></p>
+                    <p class="so-van-ban" th:utext="'<strong>Số văn bản:</strong> ' + ${vanban.document.soVanBan}"></p>
+                    <p class="so-den" th:utext="'<strong>Số đến:</strong> ' + ${vanban.document.soDen}"></p>
+                    <p class="ky-hieu" th:utext="'<strong>Số, ký hiệu của VB:</strong> ' + ${vanban.document.soKiHieuVanBan}"></p>
+                    <p class="loai-van-ban" th:utext="'<strong>Loại văn bản:</strong> ' + ${vanban.document.loaiVanBan}"></p>
+                    <p class="ngay-ban-hanh" th:utext="'<strong>Ngày ban hành:</strong> ' + ${vanban.document.ngayBanHanh}"></p>
+                    <p class="co-quan-ban-hanh" th:utext="'<strong>Cơ quan ban hành:</strong> ' + ${vanban.document.coQuanBanHanh}"></p>
+                    <p class="trich-yeu" th:utext="'<strong>Trích yếu:</strong> ' + ${vanban.document.trichYeu}"></p>
+                    <!-- Kiểm tra và hiển thị mục Người gửi -->
+                    <p class="nguoi-gui" th:if="${session.user.id != vanban.userSender.id}"
+                       th:utext="'<strong>Người gửi:</strong> ' + ${vanban.userSender.name}+'('+ ${vanban.userSender.position}+ ')'"></p>
+
+                    <!-- Kiểm tra và hiển thị mục Nội dung xử lý -->
+                    <p class="noi-dung-xu-ly" th:if="${session.user.id != vanban.userSender.id}"
+                       th:utext="'<strong>Nội dung xử lý:</strong> ' + (${vanban.statement.note} != null ? ${vanban.statement.note} : '')"></p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="content-right" id="main-content">
+
+        <!-- Right content here -->
+    </div>
+
+</div>
+<footer class="footer">
+    <div class="left">
+        <h3>Sở Nội vụ Thành phố Hồ Chí Minh</h3>
+        <p>Địa chỉ: 86B Lê Thánh Tôn, Phường Bến Nghé, Quận 1, TP.HCM</p>
+        <p>Điện thoại: (028) 38 295 110 - Fax: (028) 38 231 489 - Email: snv@sonoivu.hochiminhcity.gov.vn</p>
+        <p>NSS eGov v5.3. Thiết kế và phát triển bởi NewSaigonSoft</p>
+    </div>
+</footer>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <p class="modal-title">Trình Chánh VP</p>
+            <span class="close"><i class="fa-solid fa-xmark"></i></span>
+        </div>
+        <div class="sub-option">
+            <ul class="child-option">
+                <li>
+                    <a id="sendButton"><i class="fa-solid fa-file-export"></i> Chuyển</a>
+                </li>
+            </ul>
+        </div>
+        <form id="nextDocumentForm" method="post" th:action="@{/documents/chuyenchanhvanphong}" enctype="multipart/form-data" th:object="${documentForward}">
+            <input type="hidden" id="documentId" name="documentId">
+            <div class="form-group">
+                <div class="left">
+                    <label style="padding: 8px;">Nội dung xử lý</label>
+                    <textarea placeholder="Nhập thông tin xử lý" name="content"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="left">
+                    <label style="padding: 8px;">Người nhận <span class="required">(*)</span></label>
+                    <table class="document-table">
+                        <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAllCheckbox">
+                            </th>
+                            <th>
+                                <p>Họ và tên</p>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+<!--                            -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="left">
+                    <label style="padding: 8px;">Người xử lý chính <span class="required">(*)</span></label>
+                    <select id="selectOptions" required name="mainReceivedUser">
+                        <option value="">Chọn một tùy chọn</option>
+                        <!-- Thymeleaf options can be populated here -->
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script th:src="@{/js/script.js}"></script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const vanBanItems = document.querySelectorAll('.van-ban-item');
+        vanBanItems.forEach(item => {
+            // Định dạng ngày tháng năm
+            item.querySelector('.thoi-gian-tao').textContent = formatLocalDateTime(item.querySelector('.thoi-gian-tao').textContent);
+            item.querySelector('.ngay-ban-hanh').textContent = formatLocalDate(item.querySelector('.ngay-ban-hanh').textContent);
+        });
+        vanBanItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const documentId = this.getAttribute('id');
+
+                // Set the hidden input field with the document ID
+                document.getElementById('documentId').value = documentId;
+
+                $.ajax({
+                    url: `/documents/${documentId}`,
+                    type: 'GET',
+                    success: function(data) {
+                        console.log(data)
+                        showDetailsXuLy(
+                            data.documentForm.documentNumber,
+                            data.documentForm.arrivalNumber,
+                            data.documentForm.documentSymbol,
+                            data.documentForm.issuingAgency,
+                            data.documentForm.documentType,
+                            data.documentForm.arrivalDate,
+                            data.documentForm.issueDate,
+                            data.documentForm.summary,
+                            data.documentForm.isLegalDocument,
+                            data.documentForm.agencyLevel,
+                            data.documentForm.field,
+                            data.documentForm.note,
+                            data.documentForm.isDirectiveDocument,
+                            data.documentForm.processingTime,
+                            data.documentForm.hasPaperCopy,
+                            data.files,
+                            data.statement,
+                            data.logs
+                        );
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+    });
+
+    function showDetailsXuLy(soVanBan, soDen, soKyHieu, coQuanBanHanh, loaiVanBan, ngayDen, ngayBanHanh, trichYeu, vanBanQPPL, capCoQuan, linhVuc, ghiChu, vanBanChiDao, thoiGianXuLy, coBanGiay, files, statement, logs) {
+        const mainContent = document.getElementById('main-content');
+
+        // Kiểm tra status của statement
+        const actionsHTML = statement.status === 'FORWARDED' ? '' : `
+        <div class="sub-option">
+            <ul class="child-option">
+                <li>
+                    <a id="trinhChanhVP"><i class="fa-solid fa-file-export"></i> Trình Chánh VP</a>
+                </li>
+                <li>
+                    <a id="deleteDocument"><i class="fa-solid fa-trash"></i> Xoá</a>
+                </li>
+            </ul>
+        </div>
+    `;
+        // Format logs
+        const logsHTML = logs.map(log => `
+        <li>
+            ${formatLocalDateTime(log.documentLog.createdDate)}: ${log.user.name} : ${log.documentLog.status}
+        </li>
+        `).join('');
+
+        // Cập nhật nội dung của main-content
+        mainContent.innerHTML = `
+        ${actionsHTML}
+        <div style="padding: 10px;">
+            <h2>Chi tiết văn bản</h2>
+            <p><strong>Số văn bản:</strong> ${soVanBan}</p>
+            <p><strong>Số đến:</strong> ${soDen}</p>
+            <p><strong>Số, ký hiệu:</strong> ${soKyHieu}</p>
+            <p><strong>Cơ quan ban hành:</strong> ${coQuanBanHanh}</p>
+            <p><strong>Loại văn bản:</strong> ${loaiVanBan}</p>
+            <p><strong>Ngày đến:</strong> ${formatLocalDate(ngayDen)}</p>
+            <p><strong>Ngày ban hành:</strong> ${formatLocalDate(ngayBanHanh)}</p>
+            <p><strong>Trích yếu:</strong> ${trichYeu}</p>
+            <p><strong>Văn bản QPPL:</strong> ${vanBanQPPL ? 'Có' : 'Không'}</p>
+            <p><strong>Cấp cơ quan:</strong> ${capCoQuan}</p>
+            <p><strong>Ghi chú:</strong> ${ghiChu}</p>
+            <p><strong>Văn bản chỉ đạo:</strong> ${vanBanChiDao ? 'Có' : 'Không'}</p>
+            <p><strong>Thời gian xử lý:</strong> ${formatLocalDate(thoiGianXuLy)}</p>
+            <p><strong>Có bản giấy:</strong> ${coBanGiay ? 'Có' : 'Không'}</p>
+            <p><strong>Tệp Đính kèm:</strong></p>
+            <ul>
+                ${files.map(file => `<li><a href="#">${file.name} (${formatCapacity(file.size)})</a></li>`).join('')}
+            </ul>
+            <br>
+            <ul>
+            <p><strong>Trạng thái văn bản:</strong></p>
+            ${logsHTML}
+            </ul>
+        </div>
+    `;
+        document.getElementById('trinhChanhVP').addEventListener('click', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: '/users/chanhvanphong',  // URL API
+                type: 'GET',
+                success: function(data) {
+                    // Đổ dữ liệu vào bảng trong modal
+                    const tbody = document.querySelector('.document-table tbody');
+                    tbody.innerHTML = '';  // Xóa các dòng cũ
+
+                    data.forEach(function(user) {
+                        const row = `
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="rowCheckbox" name="receivedUsers" value="${user.user.id}" data-user_name="${user.user.name}" data-user_position="${user.user.position}" data-user_id="${user.user.id}">
+                            </td>
+                            <td>
+                                <p><strong>${user.user.name}</strong> (${user.user.position})</p>
+                            </td>
+                        </tr>`;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                    });
+
+                    // Hiển thị modal sau khi dữ liệu đã được load
+                    document.getElementById('modal').style.display = 'block';
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+        document.getElementById('deleteDocument').addEventListener('click', function(event) {
+            event.preventDefault();
+            // Hiển thị hộp thoại xác nhận
+            const confirmDelete = confirm("Bạn có chắc chắn muốn xóa văn bản này không?");
+
+            if (confirmDelete) {
+                // Nếu người dùng chọn OK, tiếp tục thực hiện xóa
+                const id_doc = document.getElementById('documentId').value;
+
+                // Tạo FormData mới để kết hợp dữ liệu từ cả hai form
+                const combinedFormData = new FormData();
+                combinedFormData.append("id", id_doc);
+
+                // Gửi dữ liệu kết hợp đến server
+                fetch('/documents/xoavanbanhanhchinh', {
+                    method: 'POST',
+                    body: combinedFormData
+                }).then(response => {
+                    if (response.redirected) {
+                        // Xử lý redirect nếu cần
+                        alert('Đã xoá văn bản.');
+                        window.location.href = response.url;
+                    } else {
+                        return response.json(); // Xử lý phản hồi JSON nếu cần
+                    }
+                }).catch(error => {
+                    // Xử lý lỗi nếu cần, mặc dù bạn không cần phải xử lý phản hồi
+                    console.error('Error:', error);
+                });
+            } else {
+                // Nếu người dùng chọn Cancel, không làm gì cả
+                alert('Đã hủy xóa văn bản.');
+            }
+        });
+    }
+
+    // Thêm sự kiện click cho nút đóng modal
+    document.querySelector('.modal .close').addEventListener('click', function() {
+        document.getElementById('modal').style.display = 'none';
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('.document-table');
+        const selectElement = document.getElementById('selectOptions');
+
+        // Delegation for row checkboxes
+        table.addEventListener('change', function(event) {
+            if (event.target.classList.contains('rowCheckbox')) {
+                const checkbox = event.target;
+                toggleHighlight(checkbox);
+                updateSelectAllCheckbox();
+                updateSelectOptions();
+            }
+        });
+
+        // Delegation for "Chọn tất cả" checkbox
+        table.addEventListener('change', function(event) {
+            if (event.target.id === 'selectAllCheckbox') {
+                const isChecked = event.target.checked;
+                const rowCheckboxes = table.querySelectorAll('.rowCheckbox');
+                rowCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                    toggleHighlight(checkbox);
+                });
+                updateSelectOptions();
+            }
+        });
+
+        // Cập nhật trạng thái của checkbox "Chọn tất cả"
+        function updateSelectAllCheckbox() {
+            const rowCheckboxes = table.querySelectorAll('.rowCheckbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allChecked = Array.from(rowCheckboxes).every(function(checkbox) {
+                return checkbox.checked;
+            });
+            selectAllCheckbox.checked = allChecked;
+        }
+
+        // Thay đổi màu nền của hàng dựa trên trạng thái checkbox
+        function toggleHighlight(checkbox) {
+            const row = checkbox.closest('tr');
+            if (checkbox.checked) {
+                row.classList.add('highlight');
+            } else {
+                row.classList.remove('highlight');
+            }
+        }
+
+        function updateSelectOptions() {
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+            const selectedUsers = new Set(); // Dùng Set để loại bỏ giá trị trùng lặp
+
+            rowCheckboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    const userId = checkbox.dataset.user_id;
+                    const userName = checkbox.dataset.user_name;
+                    const userPosition = checkbox.dataset.user_position;
+                    if (userId) {
+                        selectedUsers.add({ id: userId, name: userName, position: userPosition });
+                    }
+                }
+            });
+
+            // Xóa tất cả các tùy chọn hiện tại trong thẻ select
+            selectElement.innerHTML = '<option value="">Chọn một tùy chọn</option>';
+
+            // Thêm các tùy chọn mới vào thẻ select
+            selectedUsers.forEach(function(user) {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.name} (${user.position})`;
+                selectElement.appendChild(option);
+            });
+        }
+
+        function validateNextDocumentForm() {
+            const rowCheckboxes = table.querySelectorAll('.rowCheckbox');
+            const checkboxesChecked = Array.from(rowCheckboxes).some(checkbox => checkbox.checked);
+            const selectOptionSelected = selectElement.value !== '';
+
+            if (!checkboxesChecked) {
+                alert('Vui lòng chọn ít nhất một người nhận.');
+                return false;
+            }
+
+            if (!selectOptionSelected) {
+                alert('Vui lòng chọn người xử lý chính.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Thêm sự kiện click cho nút "Chuyển"
+        document.getElementById('sendButton').addEventListener('click', function() {
+            if (validateNextDocumentForm()) {
+                const isConfirmed = confirm('Bạn chắc chắn chuyển chánh văn phòng?');
+
+                if (isConfirmed) {
+                    const form = document.getElementById('nextDocumentForm');
+                    // Gửi biểu mẫu nếu người dùng chọn đồng ý
+                    form.submit();
+                    alert('Đã chuyển thành công!');
+                } else {
+                    // Nếu người dùng chọn hủy, không làm gì cả
+                    alert('Đã hủy thao tác lưu.');
+                }
+            }
+        });
+    });
+
+    function formatCapacity(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectElement = document.getElementById('tinhtrang');
+        const vanBanItems = document.querySelectorAll('.van-ban-item');
+
+        selectElement.addEventListener('change', function() {
+            const selectedValue = this.value;
+
+            vanBanItems.forEach(function(item) {
+                const status = item.getAttribute('data-status');
+
+                if ((selectedValue === '1' && status === 'CREATED') ||
+                    (selectedValue === '2' && status === 'FORWARDED')) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Gọi sự kiện change khi trang được load để áp dụng ngay từ đầu
+        selectElement.dispatchEvent(new Event('change'));
+    });
+
+    function formatLocalDateTime(dateTimeString) {
+        const dateTime = new Date(dateTimeString);
+
+        // Lấy các thành phần của ngày và giờ
+        const hours = String(dateTime.getHours()).padStart(2, '0');
+        const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+        const seconds = String(dateTime.getSeconds()).padStart(2, '0');
+        const day = String(dateTime.getDate()).padStart(2, '0');
+        const month = String(dateTime.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = dateTime.getFullYear();
+
+        // Định dạng ngày và giờ theo yêu cầu
+        return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+    }
+    function formatLocalDate(dateString) {
+        const date = new Date(dateString);
+
+        // Lấy các thành phần của ngày
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = date.getFullYear();
+
+        // Định dạng ngày theo yêu cầu
+        return `${day}/${month}/${year}`;
+    }
+
+</script>
+</body>
+</html>
