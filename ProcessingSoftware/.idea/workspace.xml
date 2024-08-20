@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3047abdc-91ac-41f3-944c-2c154558e8e3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../WebApp/src/main/java/com/edu/nlu/document/config/GeneralProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../WebApp/src/main/java/com/edu/nlu/document/model/DocumentLogWrapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../WebApp/src/main/java/com/edu/nlu/document/repository/DocumentLogRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../WebApp/src/main/java/com/edu/nlu/document/service/DocumentLogService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../WebApp/src/main/java/com/edu/nlu/document/service/impl/DocumentLogServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../WebApp/src/main/resources/templates/dashboard-chuyenvien.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ProcessingSoftware.iml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/../WebService/HelloWorld.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/ProcessingSoftware/ProcessingSoftware/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/dist/ProcessingSoftware/ProcessingSoftware/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../WebService/dist/WebService/WebService/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/../WebService/dist/WebService/WebService/config.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -181,6 +178,7 @@
       <workItem from="1723777857801" duration="4330000" />
       <workItem from="1723789598042" duration="1567000" />
       <workItem from="1723804510820" duration="1171000" />
+      <workItem from="1724151742162" duration="29000" />
     </task>
     <servers />
   </component>
