@@ -1,4 +1,5 @@
 from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report
 import joblib
 
 
@@ -50,7 +51,6 @@ class SVM:
             dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))
             for prob_dict in results
         ]
-
         return sorted_results
 
     def save_model(self, path_save_model):
@@ -59,3 +59,9 @@ class SVM:
     def load_model(self, path_model):
         self.model = joblib.load(path_model)
         return
+
+    def evaluate(self, X_test, y_test):
+        predictions = self.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
+        report = classification_report(y_test, predictions)
+        return accuracy, report

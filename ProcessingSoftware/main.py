@@ -10,6 +10,8 @@ import logging
 import configparser
 import sys
 
+from sklearn.model_selection import train_test_split
+
 from SVM import SVM
 from Vectorization import Vectorization
 from VietnameseTextPreprocessor import VietnameseTextPreprocessor
@@ -53,7 +55,7 @@ def read_config_preprocessing():
     config.read(config_file_path, encoding='utf-8')
 
     # Access values from the configuration file
-    multi_label = config.getboolean('Preprocessing', 'multi_label')
+    remove_duplicated = config.getboolean('Preprocessing', 'remove_duplicated')
     stopword_path = config.get('Preprocessing', 'stopword_path')
     is_remove_np = config.getboolean('Preprocessing', 'is_remove_np')
     required_columns_str = config.get('Preprocessing', 'required_columns')
@@ -63,7 +65,7 @@ def read_config_preprocessing():
     using_k_means = config.getboolean('Preprocessing', 'using_k_means')
     k = config.getint('Preprocessing', 'k')
     count_data_per_label = config.getint('Preprocessing', 'count_data_per_label')
-    return multi_label, stopword_path, is_remove_np, required_columns, input_column_name, label_column_name, using_k_means, k, count_data_per_label
+    return remove_duplicated, stopword_path, is_remove_np, required_columns, input_column_name, label_column_name, using_k_means, k, count_data_per_label
 
 
 def read_config_vectoration():
@@ -110,13 +112,15 @@ def read_config_svm():
     kernel = config.get('SVM', 'kernel')
     gamma = config.get('SVM', 'gamma')
     probability = config.getboolean('SVM', 'probability')
+    test_size = config.getfloat('SVM', 'test_size')
 
-    return svm_file_name, C, kernel, gamma, probability
+    return svm_file_name, C, kernel, gamma, probability, test_size
 
 
 # Tkinter GUI class
 class DataPreprocessor:
     def __init__(self, root):
+        self.test_size = None
         self.model_svm = None
         self.svm_file_name = None
         self.vietnameseTextPreprocessor = None
@@ -130,7 +134,7 @@ class DataPreprocessor:
         self.root.title("Data Preprocessor")
 
         self.initial_width = 800
-        self.initial_height = 300
+        self.initial_height = 400
 
         self.root.geometry(f"{self.initial_width}x{self.initial_height}")
         self.root.minsize(self.initial_width, self.initial_height)
@@ -142,7 +146,8 @@ class DataPreprocessor:
         self.frame.grid_rowconfigure(0, weight=0)
         self.frame.grid_rowconfigure(1, weight=0)
         self.frame.grid_rowconfigure(2, weight=0)
-        self.frame.grid_rowconfigure(3, weight=1)
+        self.frame.grid_rowconfigure(3, weight=0)
+        self.frame.grid_rowconfigure(4, weight=1)
 
         self.frame.grid_columnconfigure(0, weight=0)
         self.frame.grid_columnconfigure(1, weight=1)
@@ -172,16 +177,20 @@ class DataPreprocessor:
         self.browse_output_button = ttk.Button(self.frame, text="Browse", command=self.browse_folder_output, width=15)
         self.browse_output_button.grid(row=1, column=3, sticky=tk.W)
 
+        self.use_additional_option = tk.BooleanVar(value=False)
+        self.checkbox_test = tk.Checkbutton(self.frame, text="Test", variable=self.use_additional_option, onvalue=True, offvalue=False, font=("Helvetica", 13))
+        self.checkbox_test.grid(row=2, column=3, sticky=(tk.W, tk.E))
+
         self.text_widget = tk.Text(self.frame, font=("Helvetica", 13), state=tk.DISABLED)
-        self.text_widget.grid(row=3, column=0, columnspan=4, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
+        self.text_widget.grid(row=4, column=0, columnspan=4, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
 
         self.scrollbar = ttk.Scrollbar(self.frame, orient=tk.VERTICAL, command=self.text_widget.yview)
-        self.scrollbar.grid(row=3, column=3, sticky=(tk.N, tk.S, tk.E), pady=(10, 0))
+        self.scrollbar.grid(row=4, column=3, sticky=(tk.N, tk.S, tk.E), pady=(10, 0))
         self.text_widget.config(yscrollcommand=self.scrollbar.set)
 
         self.start_button = tk.Button(self.frame, text="Start", command=self.toggle_processing, width=15,
                                       bg='light green', font=("Helvetica", 13))
-        self.start_button.grid(row=2, column=3, sticky=tk.E, pady=(10, 0))
+        self.start_button.grid(row=3, column=3, sticky=tk.E, pady=(10, 0))
 
         for child in self.frame.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -210,11 +219,11 @@ class DataPreprocessor:
     def read_config(self):
         try:
             self.log_file_name, self.input_df_name, self.label_df_name = read_config_general()
-            multi_label, stopword_path, is_remove_np, self.required_columns, self.input_column_name, self.label_column_name, using_k_means, k, count_data_per_label = read_config_preprocessing()
+            remove_duplicated, stopword_path, is_remove_np, self.required_columns, self.input_column_name, self.label_column_name, using_k_means, k, count_data_per_label = read_config_preprocessing()
             self.vietnameseTextPreprocessor = VietnameseTextPreprocessor(path_stopwords=stopword_path,
-                                                                         multi_label=multi_label,
+                                                                         remove_duplicated=remove_duplicated,
                                                                          is_remove_np=is_remove_np, using_k_means=using_k_means, k=k, count_data_per_label = count_data_per_label)
-            self.svm_file_name, C, kernel, gamma, probability = read_config_svm()
+            self.svm_file_name, C, kernel, gamma, probability, self.test_size = read_config_svm()
             self.model_svm = SVM(kernel=kernel, C=C, gamma=gamma, probability=probability)
         except Exception as e:
             self.log_message(f"Error reading configuration: {str(e)}", "error")
@@ -399,16 +408,47 @@ class DataPreprocessor:
                 self.log_message("Save Vectorizing data... [COMPLETED]", "success")
                 self.log_message(f"Vectorizer data saved to '{preprocess_output_path}'", "success")
 
+                X_train, X_test, y_train, y_test = None, None, None, None
+                #Kiểm tra xem có test hay không
+                self.log_message("Checking if test data is required...", "info")
+                if self.use_additional_option.get():
+                    self.log_message("Test data is required. Proceeding with train-test split...", "success")
+                    if self.test_size >= 1 or self.test_size <= 0:
+                        self.test_size = 0.2
+                    X_train, X_test, y_train, y_test = train_test_split(X_vector, y, test_size=self.test_size, random_state=42)
+                    self.log_message(f"Train-test split completed with test size = {self.test_size}.", "info")
+                    self.log_message(f"Training data size: {X_train.shape[0]} samples", "success")
+                    self.log_message(f"Testing data size: {X_test.shape[0]} samples", "success")
+                else:
+                    self.log_message("No test data required. Using the entire dataset for training.", "success")
+                    X_train = X_vector
+                    y_train = y
+                    self.log_message(f"Training data size: {X_train.shape[0]} samples", "success")
+
                 if self.stop_event.is_set() or self.app_closing:
                     self.log_message("Processing stopped by user.", "error")
                     return
 
                 self.log_message("Training SVM model... [STARTED]", "info")
-                self.model_svm.fit(X_vector, y)
+                self.model_svm.fit(X_train, y_train)
                 svm_model_path = f'{self.output_entry.get()}/{self.svm_file_name}'
                 self.model_svm.save_model(svm_model_path)
                 self.log_message("Training SVM model... [COMPLETED]", "success")
                 self.log_message(f"SVM model saved to '{svm_model_path}'", "success")
+
+                if self.stop_event.is_set() or self.app_closing:
+                    self.log_message("Processing stopped by user.", "error")
+                    return
+
+                # Evaluate
+                if self.use_additional_option.get():
+                    self.log_message("Evaluating the SVM model... [STARTED]", "info")
+                    accuracy, report = self.model_svm.evaluate(X_test, y_test)
+
+                    self.log_message(f"Accuracy Score: {accuracy}", "info")
+                    self.log_message(f"Classification Report test:\n{report}", "info")
+
+                    self.log_message("Evaluation completed.", "success")
 
                 if self.stop_event.is_set() or self.app_closing:
                     self.log_message("Processing stopped by user.", "error")

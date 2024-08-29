@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3047abdc-91ac-41f3-944c-2c154558e8e3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../WebService/HelloWorld.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ProcessingSoftware.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ProcessingSoftware.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SVM.py" beforeDir="false" afterPath="$PROJECT_DIR$/SVM.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VietnameseTextPreprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/VietnameseTextPreprocessor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/ProcessingSoftware/ProcessingSoftware/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/dist/ProcessingSoftware/ProcessingSoftware/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebService/dist/WebService/WebService/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/../WebService/dist/WebService/WebService/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../WebService/dist/WebService/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/../WebService/dist/WebService/config.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +180,8 @@
       <workItem from="1723777857801" duration="4330000" />
       <workItem from="1723789598042" duration="1567000" />
       <workItem from="1723804510820" duration="1171000" />
-      <workItem from="1724151742162" duration="29000" />
+      <workItem from="1724151742162" duration="658000" />
+      <workItem from="1724930817023" duration="5975000" />
     </task>
     <servers />
   </component>
@@ -188,6 +191,6 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ProcessingSoftware$main.coverage" NAME="main Coverage Results" MODIFIED="1723253591954" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Source" />
     <SUITE FILE_PATH="coverage/ProcessingSoftware$VietnameseTextPreprocessor.coverage" NAME="VietnameseTextPreprocessor Coverage Results" MODIFIED="1723519094287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ProcessingSoftware$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1723804516206" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ProcessingSoftware$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1724936493884" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

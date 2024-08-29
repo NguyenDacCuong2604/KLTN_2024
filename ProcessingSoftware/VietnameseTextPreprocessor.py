@@ -6,9 +6,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class VietnameseTextPreprocessor:
-    def __init__(self, path_stopwords=None, multi_label=True, is_remove_np=True, using_k_means=False, k=10,
+    def __init__(self, path_stopwords=None, remove_duplicated=True, is_remove_np=True, using_k_means=False, k=10,
                  count_data_per_label=2000):
-        self.multi_label = multi_label
+        self.remove_duplicated = remove_duplicated
         self.stopwords = self.load_stopwords(path_stopwords)
         self.is_remove_np = is_remove_np
         self.using_k_means = using_k_means
@@ -259,7 +259,7 @@ class VietnameseTextPreprocessor:
 
     def process_df(self, df, column_input, column_label, column_input_name, column_label_name):
         df.dropna(inplace=True)
-        if not self.multi_label:
+        if self.remove_duplicated:
             df_duplicated = self.get_data_duplicated(df, column_input, column_label)
             df = df.drop(df_duplicated.index)
 
